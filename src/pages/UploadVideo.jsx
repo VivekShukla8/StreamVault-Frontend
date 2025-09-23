@@ -13,7 +13,15 @@ export default function UploadVideo() {
     thumbnail: null,
   });
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.videofile) newErrors.videofile = "Video file is required";
+    if (!formData.thumbnail) newErrors.thumbnail = "Thumbnail is required"; // optional if not mandatory
+    return newErrors;
+  };
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
@@ -26,18 +34,19 @@ export default function UploadVideo() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
-      setError("Please login to upload videos");
+      setErrors({ auth: "Please login to upload videos" });
       return;
     }
 
-    if (!formData.videofile) {
-      setError("Please select a video file");
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
 
     try {
       setUploading(true);
-      setError(null);
+      setErrors({});
       
       const uploadFormData = new FormData();
       uploadFormData.append("title", formData.title);
@@ -52,8 +61,8 @@ export default function UploadVideo() {
       // Redirect to the uploaded video
       navigate(`/video/${response.data.data._id}`);
     } catch (err) {
-      setError("Failed to upload video. Please try again.");
-      console.error("Upload error:", err);
+       setErrors({ general: "Failed to upload video. Please try again." });
+       console.error("Upload error:", err);
     } finally {
       setUploading(false);
     }
@@ -113,6 +122,7 @@ export default function UploadVideo() {
                 className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
                 placeholder="Enter an engaging title for your video"
               />
+              {errors.title && <p className="text-red-400 text-sm">{errors.title}</p>}
             </div>
 
             {/* Description */}
@@ -146,6 +156,7 @@ export default function UploadVideo() {
                   required
                   className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600/50 file:text-blue-200 hover:file:bg-blue-600/70 focus:outline-none focus:border-blue-500/50 transition-all duration-300"
                 />
+                {errors.videofile && <p className="text-red-400 text-sm mt-1">{errors.videofile}</p>}
               </div>
               <p className="text-xs text-slate-400 mt-2 flex items-center gap-2">
                 <span>📁</span>
@@ -156,7 +167,7 @@ export default function UploadVideo() {
             {/* Thumbnail */}
             <div>
               <label htmlFor="thumbnail" className="block text-sm font-medium text-slate-300 mb-3">
-                Thumbnail (Optional)
+                Thumbnail *
               </label>
               <div className="relative">
                 <input
@@ -167,6 +178,7 @@ export default function UploadVideo() {
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-600/50 file:text-green-200 hover:file:bg-green-600/70 focus:outline-none focus:border-blue-500/50 transition-all duration-300"
                 />
+                {errors.thumbnail && <p className="text-red-400 text-sm mt-1">{errors.thumbnail}</p>}
               </div>
               <p className="text-xs text-slate-400 mt-2 flex items-center gap-2">
                 <span>🖼️</span>
@@ -175,19 +187,14 @@ export default function UploadVideo() {
             </div>
 
             {/* Error Message */}
-            {error && (
-              <div className="bg-red-900/50 border border-red-700/50 text-red-300 px-4 py-3 rounded-xl">
-                <div className="flex items-center gap-2">
-                  <span>⚠️</span>
-                  {error}
-                </div>
-              </div>
-            )}
+            {/* {errors.auth && <p className="text-red-400 text-sm">{errors.auth}</p>} */}
+            {errors.general && <p className="text-red-400 text-sm">{errors.general}</p>}
+
 
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={uploading || !formData.title || !formData.videofile}
+              disabled={uploading || !formData.title || !formData.videofile || !formData.thumbnail}
               className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-6 rounded-xl font-semibold hover:from-red-700 hover:to-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-red-500/25 disabled:shadow-none flex items-center justify-center gap-3"
             >
               {uploading ? (
