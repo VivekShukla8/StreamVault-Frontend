@@ -32,7 +32,6 @@ export default function App() {
   return (
     <ToastProvider>
     <ErrorBoundary>
-      <BrowserRouter>
         <ThemeProvider>
           <AuthProvider>
             <Routes>
@@ -68,7 +67,6 @@ export default function App() {
             </Routes>
           </AuthProvider>
         </ThemeProvider>
-      </BrowserRouter>
     </ErrorBoundary>
     </ToastProvider>
   );
