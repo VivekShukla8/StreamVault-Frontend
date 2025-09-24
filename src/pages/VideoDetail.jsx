@@ -203,10 +203,16 @@ export default function VideoDetail() {
   const handleLike = async () => {
     if (!user) return;
     try {
-      const response = await likeAPI.toggleVideoLike(id);
-      setIsLiked(response.data.data.isLiked);
-      if (response.data.data.likeCount !== undefined) {
-        setLikeCount(response.data.data.likeCount);
+      // Toggle the like for this video
+      await likeAPI.toggleVideoLike(id);
+      // Fetch the updated like count from the API
+      const response = await likeAPI.getVideoLikeCount(id); 
+       // Update the local states
+      if (response.data?.data) {
+        setLikeCount(response.data.data.likeCount || 0);
+
+        // Optionally, set isLiked based on previous state toggled locally
+        setIsLiked(prev => !prev);
       }
     } catch (err) {
       console.error("Error toggling like:", err);

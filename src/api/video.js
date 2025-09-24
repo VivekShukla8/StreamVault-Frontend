@@ -18,18 +18,10 @@ export const videoAPI = {
   getVideoById: (id) => API.get(`/videos/${id}`),
   
   // Upload new video
-  uploadVideo: (formData) => API.post("/videos", formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  }),
+  uploadVideo: (data) => API.post("/videos", data),// default is JSON
   
   // Update video details
-  updateVideo: (id, data) => API.patch(`/videos/${id}`, data, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  }),
+  updateVideo: (id, data) => API.patch(`/videos/${id}`, data);
   
   // Delete video
   deleteVideo: (id) => API.delete(`/videos/${id}`),

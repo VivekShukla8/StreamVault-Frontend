@@ -93,19 +93,21 @@ export default function ProfileVideos({ user }) {
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-white">My Videos ({videos.length})</h2>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 md:gap-0">
+        <h2 className="text-2xl font-bold text-white text-center md:text-left">
+          My Videos ({videos.length})
+        </h2>
         <Link
           to="/upload"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 font-medium"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 font-medium text-center"
         >
           Upload Video
         </Link>
       </div>
 
       {/* Videos Grid */}
-     {videos.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      {videos.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 sm:gap-6 md:gap-8">
           {videos.map((video) => (
             <div key={video._id} className="relative group">
               <VideoCard video={video} />
@@ -141,7 +143,7 @@ export default function ProfileVideos({ user }) {
           ))}
         </div>
       ) : (
-        <div className="text-center py-16">
+        <div className="text-center py-16 px-4 md:px-0">
           <h3 className="text-xl font-semibold text-white mb-2">No videos uploaded yet</h3>
           <p className="text-gray-400 mb-6">Start sharing your content with the world!</p>
           <Link

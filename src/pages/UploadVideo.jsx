@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { videoAPI } from "../api/video";
 import { AuthContext } from "../features/auth/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { uploadToCloudinary } from "../utils/cloudinaryUpload";
 
 export default function UploadVideo() {
   const { user } = useContext(AuthContext);
@@ -15,28 +16,44 @@ export default function UploadVideo() {
   const [uploading, setUploading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+        <div className="bg-slate-800 p-8 rounded-xl shadow-lg max-w-md w-full text-center">
+          <h2 className="text-2xl font-bold text-white mb-4">Login Required</h2>
+          <p className="text-slate-300 mb-6">
+            Please login to upload videos and share your content.
+          </p>
+          <button
+            onClick={() => navigate("/login")}
+            className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const validateForm = () => {
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.description.trim()) newErrors.description = "Description is required";
     if (!formData.videofile) newErrors.videofile = "Video file is required";
-    if (!formData.thumbnail) newErrors.thumbnail = "Thumbnail is required"; // optional if not mandatory
+    if (!formData.thumbnail) newErrors.thumbnail = "Thumbnail is required";
     return newErrors;
   };
 
   const handleInputChange = (e) => {
     const { name, value, files } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: files ? files[0] : value
-    }));
+    setFormData({
+      ...formData,
+      [name]: files ? files[0] : value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) {
-      setErrors({ auth: "Please login to upload videos" });
-      return;
-    }
 
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
@@ -44,72 +61,56 @@ export default function UploadVideo() {
       return;
     }
 
-    try {
-      setUploading(true);
-      setErrors({});
-      
-      const uploadFormData = new FormData();
-      uploadFormData.append("title", formData.title);
-      uploadFormData.append("description", formData.description);
-      uploadFormData.append("videofile", formData.videofile);
-      if (formData.thumbnail) {
-        uploadFormData.append("thumbnail", formData.thumbnail);
-      }
+    setUploading(true);
+    setErrors({});
 
-      const response = await videoAPI.uploadVideo(uploadFormData);
-      
-      // Redirect to the uploaded video
-      navigate(`/video/${response.data.data._id}`);
-    } catch (err) {
-       setErrors({ general: "Failed to upload video. Please try again." });
-       console.error("Upload error:", err);
+    try {
+      // 1️⃣ Upload thumbnail directly to Cloudinary
+      const thumbnailData = await uploadToCloudinary(formData.thumbnail, "thumbnails");
+
+      // 2️⃣ Upload video directly to Cloudinary
+      const videoData = await uploadToCloudinary(formData.videofile, "videos");
+
+      // 3️⃣ Send URLs + public IDs to backend for DB save
+      await videoAPI.uploadVideo({
+        title: formData.title,
+        description: formData.description,
+        videofile: videoData.url,
+        thumbnail: thumbnailData.url,
+        videoPublicId: videoData.public_id,
+        thumbnailPublicId: thumbnailData.public_id,
+        duration: videoData.duration || 0,
+      });
+
+      navigate("/"); // ✅ after successful upload
+      console.log("Video file:", formData.videofile);
+      console.log("Thumbnail file:", formData.thumbnail);
+
+    } catch (error) {
+      console.log("Video file:", formData.videofile);
+      console.log("Thumbnail file:", formData.thumbnail);
+      console.error(error);
+      setErrors({ general: "Failed to upload video. Please try again." });
     } finally {
       setUploading(false);
     }
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen p-6 flex items-center justify-center">
-        <div className="text-center bg-gradient-to-br from-slate-900/80 via-gray-900/80 to-zinc-900/80 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-12 max-w-md w-full">
-          <div className="w-20 h-20 bg-gradient-to-br from-red-600 to-red-700 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span className="text-3xl">📤</span>
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-4">Sign in to upload</h2>
-          <p className="text-slate-400 mb-6">Share your content with the world</p>
-          <a
-            href="/login"
-            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-medium rounded-2xl hover:from-red-700 hover:to-red-800 transition-all duration-300 shadow-lg hover:shadow-red-500/25"
-          >
-            Sign In
-          </a>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-br from-red-600 to-red-700 rounded-2xl flex items-center justify-center">
-              <span className="text-2xl">📤</span>
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-white">Upload Video</h1>
-              <p className="text-slate-400">Share your content with the world</p>
-            </div>
-          </div>
-        </div>
+        <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-700/50 p-8">
+          <h2 className="text-3xl font-bold text-white mb-8 text-center">
+            Upload Your Video
+          </h2>
 
-        {/* Upload Form */}
-        <div className="bg-gradient-to-br from-slate-900/40 via-gray-900/40 to-zinc-900/40 backdrop-blur-xl border border-slate-700/30 rounded-3xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
             {/* Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-slate-300 mb-3">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-slate-300 mb-3"
+              >
                 Title *
               </label>
               <input
@@ -118,17 +119,23 @@ export default function UploadVideo() {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                required
-                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
+                className={`w-full px-4 py-3 bg-slate-800/50 border ${
+                  errors.title ? "border-red-500" : "border-slate-600/50"
+                } rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300`}
                 placeholder="Enter an engaging title for your video"
               />
-              {errors.title && <p className="text-red-400 text-sm">{errors.title}</p>}
+              {errors.title && (
+                <p className="text-red-400 text-sm mt-1">{errors.title}</p>
+              )}
             </div>
 
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-slate-300 mb-3">
-                Description
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-slate-300 mb-3"
+              >
+                Description *
               </label>
               <textarea
                 id="description"
@@ -136,65 +143,73 @@ export default function UploadVideo() {
                 value={formData.description}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 resize-none"
+                className={`w-full px-4 py-3 bg-slate-800/50 border ${
+                  errors.description ? "border-red-500" : "border-slate-600/50"
+                } rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 resize-none`}
                 placeholder="Describe your video content..."
               />
+              {errors.description && (
+                <p className="text-red-400 text-sm mt-1">{errors.description}</p>
+              )}
             </div>
 
             {/* Video File */}
             <div>
-              <label htmlFor="videofile" className="block text-sm font-medium text-slate-300 mb-3">
+              <label
+                htmlFor="videofile"
+                className="block text-sm font-medium text-slate-300 mb-3"
+              >
                 Video File *
               </label>
-              <div className="relative">
-                <input
-                  type="file"
-                  id="videofile"
-                  name="videofile"
-                  accept="video/*"
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600/50 file:text-blue-200 hover:file:bg-blue-600/70 focus:outline-none focus:border-blue-500/50 transition-all duration-300"
-                />
-                {errors.videofile && <p className="text-red-400 text-sm mt-1">{errors.videofile}</p>}
-              </div>
-              <p className="text-xs text-slate-400 mt-2 flex items-center gap-2">
-                <span>📁</span>
-                Supported formats: MP4, AVI, MOV, WebM (Max: 100MB)
-              </p>
+              <input
+                type="file"
+                id="videofile"
+                name="videofile"
+                accept="video/*"
+                onChange={handleInputChange}
+                className={`w-full px-4 py-3 bg-slate-800/50 border ${
+                  errors.videofile ? "border-red-500" : "border-slate-600/50"
+                } rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600/50 file:text-blue-200 hover:file:bg-blue-600/70 focus:outline-none focus:border-blue-500/50 transition-all duration-300`}
+              />
+              {errors.videofile && (
+                <p className="text-red-400 text-sm mt-1">{errors.videofile}</p>
+              )}
             </div>
 
             {/* Thumbnail */}
             <div>
-              <label htmlFor="thumbnail" className="block text-sm font-medium text-slate-300 mb-3">
+              <label
+                htmlFor="thumbnail"
+                className="block text-sm font-medium text-slate-300 mb-3"
+              >
                 Thumbnail *
               </label>
-              <div className="relative">
-                <input
-                  type="file"
-                  id="thumbnail"
-                  name="thumbnail"
-                  accept="image/*"
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600/50 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-600/50 file:text-green-200 hover:file:bg-green-600/70 focus:outline-none focus:border-blue-500/50 transition-all duration-300"
-                />
-                {errors.thumbnail && <p className="text-red-400 text-sm mt-1">{errors.thumbnail}</p>}
-              </div>
-              <p className="text-xs text-slate-400 mt-2 flex items-center gap-2">
-                <span>🖼️</span>
-                Upload a custom thumbnail or we'll generate one automatically
-              </p>
+              <input
+                type="file"
+                id="thumbnail"
+                name="thumbnail"
+                accept="image/*"
+                onChange={handleInputChange}
+                className={`w-full px-4 py-3 bg-slate-800/50 border ${
+                  errors.thumbnail ? "border-red-500" : "border-slate-600/50"
+                } rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-600/50 file:text-green-200 hover:file:bg-green-600/70 focus:outline-none focus:border-blue-500/50 transition-all duration-300`}
+              />
+              {errors.thumbnail && (
+                <p className="text-red-400 text-sm mt-1">{errors.thumbnail}</p>
+              )}
             </div>
 
-            {/* Error Message */}
-            {/* {errors.auth && <p className="text-red-400 text-sm">{errors.auth}</p>} */}
-            {errors.general && <p className="text-red-400 text-sm">{errors.general}</p>}
-
+            {/* General Error */}
+            {errors.general && (
+              <p className="text-red-400 text-sm text-center">
+                {errors.general}
+              </p>
+            )}
 
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={uploading || !formData.title || !formData.videofile || !formData.thumbnail}
+              disabled={uploading}
               className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-4 px-6 rounded-xl font-semibold hover:from-red-700 hover:to-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-red-500/25 disabled:shadow-none flex items-center justify-center gap-3"
             >
               {uploading ? (
@@ -209,20 +224,6 @@ export default function UploadVideo() {
                 </>
               )}
             </button>
-
-            {/* Upload Tips */}
-            <div className="bg-blue-900/20 border border-blue-700/30 rounded-xl p-4">
-              <h4 className="text-blue-300 font-medium mb-2 flex items-center gap-2">
-                <span>💡</span>
-                Upload Tips
-              </h4>
-              <ul className="text-sm text-blue-200/80 space-y-1">
-                <li>• Use descriptive titles to help viewers find your content</li>
-                <li>• Add detailed descriptions with relevant keywords</li>
-                <li>• Custom thumbnails get more clicks than auto-generated ones</li>
-                <li>• Ensure good video quality for better viewer experience</li>
-              </ul>
-            </div>
           </form>
         </div>
       </div>
