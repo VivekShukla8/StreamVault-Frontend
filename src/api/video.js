@@ -21,7 +21,7 @@ export const videoAPI = {
   uploadVideo: (data) => API.post("/videos", data),// default is JSON
   
   // Update video details
-  updateVideo: (id, data) => API.patch(`/videos/${id}`, data);
+  updateVideo: (id, data) => API.patch(`/videos/${id}`, data),
   
   // Delete video
   deleteVideo: (id) => API.delete(`/videos/${id}`),
