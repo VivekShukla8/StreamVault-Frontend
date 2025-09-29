@@ -12,6 +12,7 @@ import ShareButton from "../components/ShareButton";
 import Toast from "../components/Toast";
 import { useShare } from "../hooks/useShare";
 import API from "../api/axios";
+import MessageButton from "../components/MessageButton";
 
 // Custom styles for scrollbar
 const scrollbarStyles = `
@@ -439,7 +440,8 @@ export default function VideoDetail() {
             </div>
             
             {user && user._id !== video.owner._id && (
-              <button
+              <div className="flex gap-3">
+                <button
                 onClick={handleSubscribe}
                 className={`px-6 py-3 rounded-2xl font-medium text-sm transition-all duration-500 shadow-lg hover:shadow-xl active:scale-95 border relative overflow-hidden group ${isSubscribed
                     ? 'bg-slate-800/60 text-slate-300 hover:bg-slate-700/60 border-slate-700/40 hover:border-slate-600/50'
@@ -464,8 +466,12 @@ export default function VideoDetail() {
                     </>
                   )}
                 </div>
-              </button>
+                </button>
+
+                <MessageButton receiverId={video.owner._id} />
+              </div>
             )}
+
           </div>
         </div>
 

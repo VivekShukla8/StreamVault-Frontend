@@ -1,6 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../features/auth/AuthContext";
+import { 
+  HomeIcon, 
+  UserIcon, 
+  MessageCircleIcon, 
+  BellIcon,
+  SettingsIcon 
+} from "lucide-react";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -24,6 +31,7 @@ export default function Sidebar() {
     { path: "/my-videos", icon: "🎥", label: "My videos" },
     { path: "/playlists", icon: "📋", label: "Playlists" },
     { path: "/profile/videos", icon: "👤", label: "Profile" },
+    { path: "/messages/conversations", icon: "💬", label: "Messages" },
     { path: "/about", icon: "ℹ️", label: "About" },
   ] : [];
 

@@ -9,6 +9,7 @@ import VideoCard from "../components/VideoCard";
 import ShareButton from "../components/ShareButton";
 import Toast from "../components/Toast";
 import { useShare } from "../hooks/useShare";
+import MessageButton from "../components/MessageButton";
 
 export default function ChannelDetail() {
   const { id } = useParams();
@@ -380,26 +381,30 @@ export default function ChannelDetail() {
               />
               
               {user && !isOwnChannel && (
-                <button
-                  onClick={handleSubscribe}
-                  className={`px-6 py-2 rounded-full font-medium text-sm transition-all duration-200 ${
-                    isSubscribed
-                      ? 'bg-gray-200 text-black hover:bg-gray-300 active:shadow-[inset_0_0_20px_rgba(0,0,0,0.1)] active:scale-95'
-                      : 'bg-red-600 text-white hover:bg-red-700 active:shadow-[inset_0_0_20px_rgba(255,255,255,0.1)] active:scale-95'
-                  }`}
-                  style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Force pointer events
-                >
-                  {isSubscribed ? (
-                    <div className="flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                      </svg>
-                      Subscribed
-                    </div>
-                  ) : (
-                    'Subscribe'
-                  )}
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleSubscribe}
+                    className={`px-6 py-2 rounded-full font-medium text-sm transition-all duration-200 ${
+                      isSubscribed
+                        ? 'bg-gray-200 text-black hover:bg-gray-300 active:shadow-[inset_0_0_20px_rgba(0,0,0,0.1)] active:scale-95'
+                        : 'bg-red-600 text-white hover:bg-red-700 active:shadow-[inset_0_0_20px_rgba(255,255,255,0.1)] active:scale-95'
+                    }`}
+                    style={{ pointerEvents: 'auto', cursor: 'pointer' }} // Force pointer events
+                  >
+                    {isSubscribed ? (
+                      <div className="flex items-center gap-1">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        Subscribed
+                      </div>
+                    ) : (
+                      'Subscribe'
+                    )}
+                  </button>
+
+                  <MessageButton receiverId={id} />
+                </div>
               )}
             </div>
           </div>
@@ -439,6 +444,8 @@ export default function ChannelDetail() {
           >
             About
           </button>
+
+           
         </div>
       </div>
 

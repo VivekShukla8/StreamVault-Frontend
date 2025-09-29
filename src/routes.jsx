@@ -12,6 +12,8 @@ import SearchResults from "./pages/SearchResults";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import NotFound from "./pages/NotFound";
+import MessagesPage from "./components/MessagesPage";
+import ChatPage from "./components/ChatPage";
 
 export default function RoutesConfig() {
   return (
@@ -22,6 +24,7 @@ export default function RoutesConfig() {
         <Route path="/channel/:id" element={<ChannelDetail />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/upload" element={<UploadVideo />} />
+        <Route path="/messages/conversations" element={<ChatPage />} />
       </Route>
 
       <Route element={<AuthLayout />}>

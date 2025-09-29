@@ -68,6 +68,12 @@ const CustomVideoPlayer = ({
     const handleKeyDown = (e) => {
       if (!videoRef.current) return;
       
+       const tag = e.target.tagName.toLowerCase();
+      const editable = e.target.isContentEditable;
+
+      // If user is typing in an input/textarea/contenteditable, ignore shortcuts
+      if (tag === "input" || tag === "textarea" || editable) return;
+
       switch (e.code) {
         case 'Space':
           e.preventDefault();
