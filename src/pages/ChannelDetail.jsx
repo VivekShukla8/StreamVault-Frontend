@@ -37,11 +37,9 @@ export default function ChannelDetail() {
     }
   }, [id]);
 
-  // Listen for profile updates (for real-time updates)
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === 'profileUpdated') {
-        // Refresh channel data when updates are made
         fetchChannelData();
         localStorage.removeItem('profileUpdated');
       }
@@ -49,7 +47,6 @@ export default function ChannelDetail() {
 
     window.addEventListener('storage', handleStorageChange);
     
-    // Also listen for custom events within the same tab
     const handleProfileUpdate = () => {
       fetchChannelData();
     };
@@ -62,7 +59,6 @@ export default function ChannelDetail() {
     };
   }, []);
 
-  // Fetch subscription status separately when user is available
   useEffect(() => {
     if (id && user) {
       fetchSubscriptionStatus();
@@ -89,7 +85,6 @@ export default function ChannelDetail() {
         channelAPI.getChannelVideos(id)
       ]);
       
-      // Backend returns: { channel: {...}, stats: {...} }
       if (channelResponse.data && channelResponse.data.data) {
         setChannel(channelResponse.data.data.channel);
         setStats(channelResponse.data.data.stats);
@@ -103,14 +98,10 @@ export default function ChannelDetail() {
         setVideos([]);
       }
       
-      // Fetch tweets for this channel (public endpoint)
       try {
         const tweetsResponse = await getUserTweets(id);
-        
-        // The response structure should be: { data: { tweets: [...], totalTweets: N, ... } }
         const tweetsData = tweetsResponse.data?.data;
         const tweets = tweetsData?.tweets || tweetsData?.docs || [];
-        
         setTweets(tweets);
       } catch (tweetErr) {
         console.log("Could not fetch tweets:", tweetErr);
@@ -131,10 +122,8 @@ export default function ChannelDetail() {
     
     try {
       const response = await subscriptionAPI.toggleSubscription(id);
-      // Use the actual state returned from backend
       setIsSubscribed(response.data.data.isSubscribed);
       
-      // Fetch updated channel data to get accurate stats
       const channelResponse = await channelAPI.getChannel(id);
       if (channelResponse.data?.data?.stats) {
         setStats(channelResponse.data.data.stats);
@@ -150,17 +139,14 @@ export default function ChannelDetail() {
       setTimeout(() => setLoginToast(false), 2000);
       return;
     }
-    // Prevent multiple simultaneous likes on the same tweet
     if (likingTweets.has(tweetId)) return;
 
     try {
       setLikingTweets(prev => new Set(prev).add(tweetId));
       const response = await toggleTweetLike(tweetId);
       
-      // Use the backend response to ensure consistency
       const { isLiked, likeCount } = response.data?.data || {};
       
-      // Update tweets state to reflect like change
       setTweets(prevTweets => 
         prevTweets.map(tweet => {
           if (tweet._id === tweetId) {
@@ -200,7 +186,6 @@ export default function ChannelDetail() {
     const now = new Date();
     const videoDate = new Date(date);
     
-    // Check if date is valid
     if (isNaN(videoDate.getTime())) {
       return 'Unknown time';
     }
@@ -230,16 +215,21 @@ export default function ChannelDetail() {
 
   if (loading) return <Loader />;
   if (error) return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-black flex items-center justify-center">
-      <div className="text-center p-8 bg-gradient-to-br from-red-900/20 to-red-800/10 border border-red-500/20 rounded-2xl backdrop-blur-sm">
-        <div className="text-red-400 text-lg font-medium">{error}</div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-6">
+      <div className="text-center p-8 bg-gradient-to-br from-red-900/30 to-pink-900/30 backdrop-blur-sm border border-red-600/30 rounded-2xl max-w-md">
+        <div className="w-16 h-16 bg-gradient-to-br from-red-900/50 to-pink-900/50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-600/10">
+          <svg className="w-8 h-8 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <div className="text-red-400 text-lg font-semibold">{error}</div>
       </div>
     </div>
   );
   if (!channel) return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-black flex items-center justify-center">
-      <div className="text-center p-8 bg-gradient-to-br from-gray-800/40 to-gray-700/20 border border-gray-600/20 rounded-2xl backdrop-blur-sm">
-        <div className="text-gray-300 text-lg">Channel not found</div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black flex items-center justify-center p-6">
+      <div className="text-center p-8 bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-2xl max-w-md">
+        <div className="text-gray-300 text-lg font-medium">Channel not found</div>
       </div>
     </div>
   );
@@ -247,12 +237,11 @@ export default function ChannelDetail() {
   const isOwnChannel = user && user._id === id;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-800 to-black">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black relative overflow-hidden">
       {/* Animated Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-purple-600/10 to-blue-600/10 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute top-1/2 right-0 w-80 h-80 bg-gradient-to-br from-pink-600/10 to-purple-600/10 rounded-full blur-3xl transform translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-gradient-to-br from-blue-600/10 to-cyan-600/10 rounded-full blur-3xl"></div>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gray-700/3 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gray-600/3 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto p-4 lg:p-8">
@@ -260,7 +249,7 @@ export default function ChannelDetail() {
         <div className="mb-12">
           {/* Cover Image */}
           {channel.coverImage && !coverImageError ? (
-            <div className="h-30 md:h-35 lg:h-35 bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl mb-8 overflow-hidden relative shadow-2xl border border-gray-700/50">
+            <div className="h-48 md:h-56 lg:h-64 bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-2xl mb-8 overflow-hidden relative shadow-2xl border border-gray-800/50">
               <img
                 src={channel.coverImage}
                 alt="Cover"
@@ -278,28 +267,26 @@ export default function ChannelDetail() {
                   setCoverImageLoading(true);
                 }}
               />
-              {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
               
-              {/* Loading overlay for cover image */}
               {coverImageLoading && (
                 <div className="absolute inset-0 bg-black/70 flex items-center justify-center backdrop-blur-sm">
                   <div className="text-center">
-                    <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-4"></div>
+                    <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-white font-medium">Loading cover image...</p>
                   </div>
                 </div>
               )}
             </div>
           ) : channel.coverImage && coverImageError ? (
-            <div className="h-48 md:h-64 lg:h-72 bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-3xl mb-8 overflow-hidden flex items-center justify-center border border-gray-700/50 backdrop-blur-sm">
+            <div className="h-48 md:h-56 lg:h-64 bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-2xl mb-8 overflow-hidden flex items-center justify-center">
               <div className="text-center p-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-red-500/20 to-red-600/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-20 h-20 bg-gradient-to-br from-red-900/30 to-pink-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-red-600/30">
                   <svg className="w-10 h-10 text-red-400" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/>
                   </svg>
                 </div>
-                <p className="text-gray-300 text-lg mb-4">Cover image failed to load</p>
+                <p className="text-gray-300 text-lg mb-4 font-medium">Cover image failed to load</p>
                 <button 
                   onClick={() => {
                     setCoverImageError(false);
@@ -312,7 +299,7 @@ export default function ChannelDetail() {
                     };
                     img.src = channel.coverImage;
                   }}
-                  className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-600/20 font-semibold"
                 >
                   Retry
                 </button>
@@ -324,7 +311,7 @@ export default function ChannelDetail() {
           <div className="flex flex-col lg:flex-row items-start gap-8">
             {/* Avatar */}
             <div className="relative group">
-              <div className="w-32 h-32 lg:w-40 lg:h-40 bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-600 rounded-full flex items-center justify-center flex-shrink-0 relative shadow-2xl border-4 border-white/10 backdrop-blur-sm">
+              <div className="w-32 h-32 lg:w-40 lg:h-40 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 relative shadow-2xl ring-4 ring-gray-800/50 group-hover:ring-blue-600/50 transition-all duration-300">
                 {channel.avatar && !avatarError ? (
                   <img
                     src={channel.avatar}
@@ -344,14 +331,13 @@ export default function ChannelDetail() {
                   </span>
                 )}
               </div>
-              {/* Glow Effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-cyan-600/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500 -z-10"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-500 -z-10"></div>
             </div>
             
             <div className="flex-1 space-y-6">
-              {/* Channel Name & Verification */}
+              {/* Channel Name */}
               <div>
-                <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent mb-2">
+                <h1 className="text-3xl lg:text-4xl font-bold text-transparent bg-gradient-to-r from-slate-200 via-slate-100 to-slate-300 bg-clip-text mb-2">
                   {channel.username}
                 </h1>
                 {channel.fullname && (
@@ -360,33 +346,33 @@ export default function ChannelDetail() {
               </div>
               
               {/* Channel Stats */}
-              <div className="flex flex-wrap items-center gap-6 lg:gap-8">
-                <div className="flex items-center gap-2 bg-gradient-to-r from-purple-900/30 to-blue-900/30 px-4 py-2 rounded-full border border-purple-500/20 backdrop-blur-sm">
-                  <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-blue-400 rounded-full"></div>
-                  <span className="text-gray-200 font-medium">{formatViews(stats?.totalSubscribers || 0)} subscribers</span>
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2 bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-blue-800/30 px-4 py-2 rounded-lg hover:border-blue-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-600/10">
+                  <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                  <span className="text-gray-200 font-medium text-sm">{formatViews(stats?.totalSubscribers || 0)} subscribers</span>
                 </div>
-                <div className="flex items-center gap-2 bg-gradient-to-r from-blue-900/30 to-cyan-900/30 px-4 py-2 rounded-full border border-blue-500/20 backdrop-blur-sm">
-                  <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full"></div>
-                  <span className="text-gray-200 font-medium">{stats?.totalVideos || 0} videos</span>
+                <div className="flex items-center gap-2 bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-green-800/30 px-4 py-2 rounded-lg hover:border-green-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-green-600/10">
+                  <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                  <span className="text-gray-200 font-medium text-sm">{stats?.totalVideos || 0} videos</span>
                 </div>
                 {isOwnChannel && stats?.totalViews && (
-                  <div className="flex items-center gap-2 bg-gradient-to-r from-green-900/30 to-emerald-900/30 px-4 py-2 rounded-full border border-green-500/20 backdrop-blur-sm">
-                    <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full"></div>
-                    <span className="text-gray-200 font-medium">{formatViews(stats.totalViews)} total views</span>
+                  <div className="flex items-center gap-2 bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-purple-800/30 px-4 py-2 rounded-lg hover:border-purple-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-600/10">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                    <span className="text-gray-200 font-medium text-sm">{formatViews(stats.totalViews)} total views</span>
                   </div>
                 )}
                 {isOwnChannel && stats?.totalLikes && (
-                  <div className="flex items-center gap-2 bg-gradient-to-r from-pink-900/30 to-rose-900/30 px-4 py-2 rounded-full border border-pink-500/20 backdrop-blur-sm">
-                    <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full"></div>
-                    <span className="text-gray-200 font-medium">{formatViews(stats.totalLikes)} total likes</span>
+                  <div className="flex items-center gap-2 bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-pink-800/30 px-4 py-2 rounded-lg hover:border-pink-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-pink-600/10">
+                    <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                    <span className="text-gray-200 font-medium text-sm">{formatViews(stats.totalLikes)} total likes</span>
                   </div>
                 )}
               </div>
               
               {/* Bio */}
               {channel.bio && (
-                <div className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 backdrop-blur-sm border border-gray-600/30 rounded-2xl p-6">
-                  <p className="text-gray-200 leading-relaxed text-lg whitespace-pre-wrap">
+                <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-xl p-6 hover:border-gray-700/50 transition-all duration-300">
+                  <p className="text-gray-200 leading-relaxed text-base whitespace-pre-wrap">
                     {channel.bio}
                   </p>
                 </div>
@@ -397,7 +383,7 @@ export default function ChannelDetail() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span>
+                <span className="text-sm">
                   Joined {channel.createdAt || channel.joinedAt || channel.registeredAt ? 
                     formatTimeAgo(channel.createdAt || channel.joinedAt || channel.registeredAt) : 
                     'Unknown time'
@@ -406,13 +392,13 @@ export default function ChannelDetail() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-3 flex-wrap">
                 <button
                   onClick={() => {
                     console.log('Force refreshing channel...');
                     fetchChannelData();
                   }}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-700/50 to-gray-600/50 hover:from-gray-600/60 hover:to-gray-500/60 text-white rounded-xl transition-all duration-300 transform hover:scale-105 border border-gray-500/30 backdrop-blur-sm"
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-900/40 hover:bg-gray-900/60 text-gray-300 hover:text-white rounded-lg transition-all duration-300 border border-gray-800/50 hover:border-gray-700/50 hover:shadow-lg hover:shadow-gray-600/10 text-sm font-medium"
                   title="Refresh Channel"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -421,7 +407,6 @@ export default function ChannelDetail() {
                   Refresh
                 </button>
                 
-                {/* Share Channel Button */}
                 <ShareButton
                   onClick={() => shareChannel(id)}
                   size="medium"
@@ -430,13 +415,13 @@ export default function ChannelDetail() {
                 />
                 
                 {user && !isOwnChannel && (
-                  <div className="flex gap-4">
+                  <div className="flex gap-3">
                     <button
                       onClick={handleSubscribe}
-                      className={`flex items-center gap-2 px-4 py-3 rounded-xl font-semibold text-base transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                      className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-lg ${
                         isSubscribed
-                          ? 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white border border-gray-500/30'
-                          : 'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white shadow-red-500/25'
+                          ? 'bg-gray-900/40 hover:bg-gray-900/60 text-white border border-gray-700/50 hover:border-gray-600/50'
+                          : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-blue-600/20 hover:shadow-blue-600/40'
                       }`}
                     >
                       {isSubscribed ? (
@@ -466,13 +451,13 @@ export default function ChannelDetail() {
 
         {/* Tabs */}
         <div className="mb-8">
-          <div className="flex border-b border-gray-700/50 bg-gradient-to-r from-gray-800/30 to-gray-700/20 rounded-t-2xl backdrop-blur-sm">
+          <div className="flex border-b border-gray-800/50 bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl rounded-t-xl">
             <button
               onClick={() => setActiveTab('videos')}
-              className={`flex items-center gap-2 px-8 py-4 font-semibold transition-all duration-300 relative ${
+              className={`flex items-center gap-2 px-6 py-4 font-semibold transition-all duration-300 relative text-sm ${
                 activeTab === 'videos'
-                  ? 'text-white bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-b-2 border-blue-500'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  ? 'text-white border-b-2 border-blue-500'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -482,10 +467,10 @@ export default function ChannelDetail() {
             </button>
             <button
               onClick={() => setActiveTab('tweets')}
-              className={`flex items-center gap-2 px-8 py-4 font-semibold transition-all duration-300 relative ${
+              className={`flex items-center gap-2 px-6 py-4 font-semibold transition-all duration-300 relative text-sm ${
                 activeTab === 'tweets'
-                  ? 'text-white bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-b-2 border-purple-500'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  ? 'text-white border-b-2 border-purple-500'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -495,10 +480,10 @@ export default function ChannelDetail() {
             </button>
             <button
               onClick={() => setActiveTab('about')}
-              className={`flex items-center gap-2 px-8 py-4 font-semibold transition-all duration-300 relative ${
+              className={`flex items-center gap-2 px-6 py-4 font-semibold transition-all duration-300 relative text-sm ${
                 activeTab === 'about'
-                  ? 'text-white bg-gradient-to-r from-green-600/20 to-cyan-600/20 border-b-2 border-green-500'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-700/30'
+                  ? 'text-white border-b-2 border-green-500'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -511,38 +496,38 @@ export default function ChannelDetail() {
 
         {/* Content based on active tab */}
         {activeTab === 'videos' && (
-          <div className="bg-gradient-to-br from-gray-800/20 to-gray-900/20 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/30">
+          <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl rounded-xl p-6 border border-gray-800/50">
             {videos.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {videos.map((video) => (
-                  <div key={video._id} className="transform hover:scale-105 transition-all duration-300">
+                  <div key={video._id} className="transform hover:scale-105 transition-all duration-300 scale-90">
                     <VideoCard video={video} channelData={channel} />
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-20">
-                <div className="w-24 h-24 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-24 h-24 bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <svg className="w-12 h-12 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-300 mb-3">No videos uploaded yet</h3>
-                <p className="text-gray-500 text-lg">This channel hasn't uploaded any videos.</p>
+                <h3 className="text-2xl font-bold text-transparent bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text mb-3">No videos uploaded yet</h3>
+                <p className="text-gray-400 text-base">This channel hasn't uploaded any videos.</p>
               </div>
             )}
           </div>
         )}
 
         {activeTab === 'tweets' && (
-          <div className="bg-gradient-to-br from-gray-800/20 to-gray-900/20 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/30">
+          <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl rounded-xl p-6 border border-gray-800/50">
             {tweets.length > 0 ? (
               <div className="space-y-6">
                 {tweets.map((tweet) => (
-                  <div key={tweet._id} className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 rounded-2xl p-6 border border-gray-700/50 hover:border-gray-600/60 transition-all duration-300 backdrop-blur-sm transform hover:scale-[1.02]">
+                  <div key={tweet._id} className="bg-gradient-to-br from-gray-900/40 to-gray-800/30 rounded-xl p-6 border border-gray-800/50 hover:border-gray-700/50 transition-all duration-300 backdrop-blur-sm hover:shadow-lg hover:shadow-gray-600/10">
                    <div className="flex items-start gap-4">
                       {/* Avatar */}
-                      <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-purple-500/20">
+                      <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-gray-700/50">
                         {tweet.owner?.avatar ? (
                           <img
                             src={tweet.owner.avatar}
@@ -562,52 +547,53 @@ export default function ChannelDetail() {
                       <div className="flex-1 min-w-0">
                         {/* Header */}
                         <div className="flex items-center gap-2 mb-3">
-                          <span className="font-semibold text-white text-base">{tweet.owner?.username}</span>
+                          <span className="font-semibold text-white text-sm">{tweet.owner?.username}</span>
                           <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-                          <span className="text-sm text-gray-400">
+                          <span className="text-xs text-gray-400">
                             {formatTimeAgo(tweet.createdAt)}
                           </span>
                         </div>
                         
                         {/* Tweet Text */}
-                        <p className="text-gray-200 text-base leading-relaxed mb-6 whitespace-pre-wrap">
+                        <p className="text-gray-200 text-sm leading-relaxed mb-4 whitespace-pre-wrap">
                           {tweet.content}
                         </p>
                         
                         {/* Actions */}
-                        <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-4">
                           {/* Like Button */}
                           <button
                             onClick={() => handleTweetLike(tweet._id)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 transform hover:scale-105 ${
+                            disabled={likingTweets.has(tweet._id)}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-300 text-xs font-medium ${
                               tweet.isLiked 
                                 ? 'text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20' 
-                                : 'text-gray-400 hover:text-red-400 hover:bg-red-500/10 border border-gray-700/50 hover:border-red-500/30'
+                                : 'text-gray-400 hover:text-red-400 hover:bg-red-500/10 border border-gray-800/50 hover:border-red-500/30'
                             }`}
                           >
-                            <svg className="w-5 h-5" fill={tweet.isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill={tweet.isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
-                            <span className="text-sm font-medium">{tweet.likesCount || 0}</span>
+                            <span>{tweet.likesCount || 0}</span>
                           </button>
                           
                           {/* Reply Button */}
                           <button 
                            onClick={() => setReplyToast(true)}
-                           className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 border border-gray-700/50 hover:border-blue-500/30 transition-all duration-300 transform hover:scale-105">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 border border-gray-800/50 hover:border-blue-500/30 transition-all duration-300 text-xs font-medium">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                             </svg>
-                            <span className="text-sm font-medium">Reply</span>
+                            <span>Reply</span>
                           </button>
                           
                           {/* Share Button */}
                           <button onClick={() => copyTweetUrl(tweet._id)}
-                          className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-400 hover:text-green-400 hover:bg-green-500/10 border border-gray-700/50 hover:border-green-500/30 transition-all duration-300 transform hover:scale-105">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-gray-400 hover:text-green-400 hover:bg-green-500/10 border border-gray-800/50 hover:border-green-500/30 transition-all duration-300 text-xs font-medium">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                             </svg>
-                            <span className="text-sm font-medium">Share</span>
+                            <span>Share</span>
                           </button>
                         </div>
                       </div>
@@ -617,62 +603,62 @@ export default function ChannelDetail() {
               </div>
             ) : (
               <div className="text-center py-20">
-                <div className="w-24 h-24 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8.5 5.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5zM21 9.5h-4.17l1.83-1.83c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0L14.5 9.5h-5L6.75 6.75c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41L7.17 9.5H3c-.55 0-1 .45-1 1s.45 1 1 1h4.17l-1.83 1.83c-.39.39-.39 1.02 0 1.41.2.2.45.29.71.29s.51-.1.71-.29L9.5 12.5h5l2.75 2.75c.2.2.45.29.71.29s.51-.1.71-.29c.39-.39.39-1.02 0-1.41L16.83 11.5H21c.55 0 1-.45 1-1s-.45-1-1-1z"/>
+                <div className="w-24 h-24 bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <svg className="w-12 h-12 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-300 mb-3">No tweets yet</h3>
-                <p className="text-gray-500 text-lg">This user hasn't shared any thoughts yet.</p>
+                <h3 className="text-2xl font-bold text-transparent bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text mb-3">No tweets yet</h3>
+                <p className="text-gray-400 text-base">This user hasn't shared any thoughts yet.</p>
               </div>
             )}
           </div>
         )}
 
         {activeTab === 'about' && (
-          <div className="bg-gradient-to-br from-gray-800/30 to-gray-900/30 backdrop-blur-xl border border-gray-700/40 rounded-3xl p-8 lg:p-10">
+          <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-xl p-8 lg:p-10">
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Channel Information</h2>
+              <h2 className="text-3xl font-bold text-transparent bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text">Channel Information</h2>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               {/* Stats Section */}
               <div className="space-y-8">
                 <div className="grid grid-cols-2 gap-6">
-                  <div className="bg-gradient-to-br from-blue-900/40 to-blue-800/20 border border-blue-500/30 rounded-2xl p-6 text-center backdrop-blur-sm transform hover:scale-105 transition-all duration-300">
-                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent mb-2">
+                  <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-blue-800/30 rounded-xl p-6 text-center hover:border-blue-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-600/10 group">
+                    <div className="text-3xl font-bold text-blue-400 mb-2 group-hover:text-blue-300 transition-colors duration-300">
                       {formatViews(stats?.totalSubscribers || 0)}
                     </div>
-                    <div className="text-blue-300 font-medium">Subscribers</div>
+                    <div className="text-blue-300 font-medium text-sm">Subscribers</div>
                   </div>
-                  <div className="bg-gradient-to-br from-green-900/40 to-green-800/20 border border-green-500/30 rounded-2xl p-6 text-center backdrop-blur-sm transform hover:scale-105 transition-all duration-300">
-                    <div className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent mb-2">
+                  <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-green-800/30 rounded-xl p-6 text-center hover:border-green-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-green-600/10 group">
+                    <div className="text-3xl font-bold text-green-400 mb-2 group-hover:text-green-300 transition-colors duration-300">
                       {stats?.totalVideos || 0}
                     </div>
-                    <div className="text-green-300 font-medium">Videos</div>
+                    <div className="text-green-300 font-medium text-sm">Videos</div>
                   </div>
                 </div>
                 
                 {/* Channel Details */}
                 <div className="space-y-6">
-                  <div className="bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-500/20 rounded-2xl p-6 backdrop-blur-sm">
+                  <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-xl p-6 hover:border-gray-700/50 transition-all duration-300">
                     <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                      <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
                       </svg>
                       Description
                     </h3>
-                    <p className="text-gray-300 leading-relaxed text-lg">
+                    <p className="text-gray-300 leading-relaxed text-base">
                       {channel.bio || 'No description available.'}
                     </p>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-gray-800/40 to-gray-700/20 border border-gray-600/30 rounded-2xl p-6 backdrop-blur-sm">
+                  <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-xl p-6 hover:border-gray-700/50 transition-all duration-300">
                     <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -680,20 +666,20 @@ export default function ChannelDetail() {
                       Statistics
                     </h3>
                     <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 bg-gradient-to-r from-gray-700/30 to-gray-600/20 rounded-xl">
-                        <span className="text-gray-400 font-medium">Joined</span>
-                        <span className="text-white font-semibold">
+                      <div className="flex justify-between items-center p-3 bg-gray-900/40 rounded-lg border border-gray-800/30 hover:border-gray-700/50 transition-all duration-300">
+                        <span className="text-gray-400 font-medium text-sm">Joined</span>
+                        <span className="text-white font-semibold text-sm">
                           {channel.createdAt ? formatTimeAgo(channel.createdAt) : 'Unknown'}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center p-3 bg-gradient-to-r from-gray-700/30 to-gray-600/20 rounded-xl">
-                        <span className="text-gray-400 font-medium">Total views</span>
-                        <span className="text-white font-semibold">{formatViews(stats?.totalViews || 0)}</span>
+                      <div className="flex justify-between items-center p-3 bg-gray-900/40 rounded-lg border border-gray-800/30 hover:border-gray-700/50 transition-all duration-300">
+                        <span className="text-gray-400 font-medium text-sm">Total views</span>
+                        <span className="text-white font-semibold text-sm">{formatViews(stats?.totalViews || 0)}</span>
                       </div>
                       {isOwnChannel && stats?.totalLikes && (
-                        <div className="flex justify-between items-center p-3 bg-gradient-to-r from-gray-700/30 to-gray-600/20 rounded-xl">
-                          <span className="text-gray-400 font-medium">Total likes</span>
-                          <span className="text-white font-semibold">{formatViews(stats.totalLikes)}</span>
+                        <div className="flex justify-between items-center p-3 bg-gray-900/40 rounded-lg border border-gray-800/30 hover:border-gray-700/50 transition-all duration-300">
+                          <span className="text-gray-400 font-medium text-sm">Total likes</span>
+                          <span className="text-white font-semibold text-sm">{formatViews(stats.totalLikes)}</span>
                         </div>
                       )}
                     </div>
@@ -705,7 +691,7 @@ export default function ChannelDetail() {
               <div className="space-y-8">
                 <div className="text-center">
                   <div className="relative group mb-6">
-                    <div className="w-48 h-48 mx-auto rounded-full overflow-hidden border-4 border-gradient-to-r from-purple-500/50 to-pink-500/50 shadow-2xl">
+                    <div className="w-48 h-48 mx-auto rounded-full overflow-hidden ring-4 ring-gray-800/50 group-hover:ring-blue-600/50 shadow-2xl transition-all duration-300">
                       {channel.avatar ? (
                         <img
                           src={channel.avatar}
@@ -713,49 +699,48 @@ export default function ChannelDetail() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                        <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
                           <span className="text-6xl font-bold text-white">
                             {channel.username?.charAt(0)?.toUpperCase() || 'U'}
                           </span>
                         </div>
                       )}
                     </div>
-                    {/* Glow Effect */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 to-pink-600/30 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-500 -z-10"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-full blur-2xl group-hover:blur-3xl transition-all duration-500 -z-10"></div>
                   </div>
                   
-                  <div className="bg-gradient-to-br from-gray-800/50 to-gray-700/30 border border-gray-600/40 rounded-2xl p-6 backdrop-blur-sm">
-                    <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-2">
+                  <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-xl p-6 hover:border-gray-700/50 transition-all duration-300">
+                    <h3 className="text-2xl font-bold text-transparent bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text mb-2">
                       {channel.fullname || channel.username}
                     </h3>
-                    <p className="text-gray-400 text-lg mb-4">@{channel.username}</p>
+                    <p className="text-gray-400 text-base mb-4">@{channel.username}</p>
                     
                     {/* Additional Info */}
                     <div className="grid grid-cols-1 gap-4">
                       {stats?.totalSubscribers > 0 && (
-                        <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/20 rounded-xl p-4">
+                        <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 border border-blue-800/30 rounded-lg p-4 hover:border-blue-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-600/10">
                           <div className="text-2xl font-bold text-blue-400 mb-1">
                             {formatViews(stats.totalSubscribers)}
                           </div>
-                          <div className="text-sm text-blue-300">Subscribers</div>
+                          <div className="text-xs text-blue-300">Subscribers</div>
                         </div>
                       )}
                       
                       {stats?.totalVideos > 0 && (
-                        <div className="bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-500/20 rounded-xl p-4">
+                        <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 border border-green-800/30 rounded-lg p-4 hover:border-green-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-green-600/10">
                           <div className="text-2xl font-bold text-green-400 mb-1">
                             {stats.totalVideos}
                           </div>
-                          <div className="text-sm text-green-300">Videos Published</div>
+                          <div className="text-xs text-green-300">Videos Published</div>
                         </div>
                       )}
                       
                       {isOwnChannel && stats?.totalViews > 0 && (
-                        <div className="bg-gradient-to-r from-pink-900/30 to-rose-900/30 border border-pink-500/20 rounded-xl p-4">
+                        <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 border border-pink-800/30 rounded-lg p-4 hover:border-pink-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-pink-600/10">
                           <div className="text-2xl font-bold text-pink-400 mb-1">
                             {formatViews(stats.totalViews)}
                           </div>
-                          <div className="text-sm text-pink-300">Total Views</div>
+                          <div className="text-xs text-pink-300">Total Views</div>
                         </div>
                       )}
                     </div>

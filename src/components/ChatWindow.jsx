@@ -309,7 +309,7 @@ export default function SocketChatWindow({ conversationId }) {
       </div>
 
       {/* Enhanced Header with Gradient */}
-      <div className="flex items-center p-4 border-b border-white/5 bg-gradient-to-r from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl shadow-2xl relative z-10 mt-12">
+      <div className="flex items-center p-4 border-b border-white/5 bg-gradient-to-r from-gray-900/95 via-slate-900/95 to-black/95 backdrop-blur-xl shadow-2xl relative z-10 mt-16 mb-[-2px]">
         <div className="absolute inset-0 bg-gradient-to-r from-gray-700/5 to-slate-600/5"></div>
         
         {otherUser ? (

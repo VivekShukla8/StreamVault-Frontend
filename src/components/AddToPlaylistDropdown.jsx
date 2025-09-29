@@ -88,7 +88,7 @@ export default function AddToPlaylistDropdown({ videoId, onClose }) {
   return (
     <div 
       ref={dropdownRef}
-      className={`absolute right-0 ${showAbove ? 'bottom-full mb-1' : 'top-full mt-1'} bg-gray-800 border border-gray-700 rounded-lg shadow-2xl z-[1000] min-w-[280px] max-w-[320px] backdrop-blur-xl bg-gray-800/95`}
+      className={`absolute right-0 ${showAbove ? 'bottom-full mb-1' : 'top-full mt-1'} bg-gray-800 border border-gray-700 rounded-lg shadow-2xl z-[1000] min-w-[280px] max-w-[320px] backdrop-blur-xl `}
     >
       <div className="p-4">
         <h3 className="text-sm font-semibold mb-3">Save to playlist</h3>

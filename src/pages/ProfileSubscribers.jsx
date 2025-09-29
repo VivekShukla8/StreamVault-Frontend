@@ -22,7 +22,7 @@ export default function ProfileSubscribers({ user }) {
     } catch (err) {
       console.error('Error fetching subscribers:', err);
       if (err.response?.status === 404) {
-        setSubscribers([]); // No subscribers found
+        setSubscribers([]);
       } else {
         setError('Failed to load subscribers');
       }
@@ -44,15 +44,22 @@ export default function ProfileSubscribers({ user }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-white">My Subscribers ({subscribers.length})</h2>
+        <h2 className="text-2xl font-bold text-transparent bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text">
+          My Subscribers ({subscribers.length})
+        </h2>
       </div>
 
       {error && (
-        <div className="text-center py-8">
-          <div className="text-red-400 text-lg mb-4">{error}</div>
+        <div className="bg-gradient-to-r from-red-900/30 to-pink-900/30 backdrop-blur-sm border border-red-600/30 rounded-xl p-8 text-center">
+          <div className="w-16 h-16 bg-gradient-to-br from-red-900/50 to-pink-900/50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-red-600/10">
+            <svg className="w-8 h-8 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="text-red-400 text-lg font-semibold mb-4">{error}</div>
           <button 
             onClick={fetchSubscribers}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-2.5 bg-gradient-to-r from-red-600/50 to-pink-600/50 hover:from-red-600/70 hover:to-pink-600/70 text-red-200 rounded-lg transition-all duration-300 font-semibold shadow-md hover:shadow-lg hover:shadow-red-600/20"
           >
             Try Again
           </button>
@@ -62,13 +69,26 @@ export default function ProfileSubscribers({ user }) {
       {subscribers.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {subscribers.map((subscriber) => (
-            <div key={subscriber.subscriberId} className="bg-gray-900 border border-gray-800 rounded-xl p-6 hover:border-gray-700 transition-colors">
+            <div 
+              key={subscriber.subscriberId} 
+              className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-xl p-6 hover:border-gray-700/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-600/10 group"
+            >
               <div className="flex items-center gap-4">
                 {/* Subscriber Avatar */}
-                <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl font-semibold text-white">
-                    {subscriber.username?.charAt(0)?.toUpperCase() || 'U'}
-                  </span>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ring-2 ring-gray-700/50 group-hover:ring-blue-600/50 transition-all duration-300 shadow-md group-hover:shadow-lg group-hover:shadow-blue-600/10">
+                  {subscriber.avatar ? (
+                    <img
+                      src={subscriber.avatar}
+                      alt={subscriber.username}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                      <span className="text-xl font-bold text-white">
+                        {subscriber.username?.charAt(0)?.toUpperCase() || 'U'}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex-1 min-w-0">
@@ -92,13 +112,13 @@ export default function ProfileSubscribers({ user }) {
               </div>
               
               {/* Visit Channel Button */}
-              <div className="mt-4 pt-4 border-t border-gray-800">
+              <div className="mt-4 pt-4 border-t border-gray-800/50">
                 <Link
                   to={`/channel/${subscriber.subscriberId}`}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition-colors text-sm font-medium"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-900/40 text-gray-300 rounded-lg hover:bg-gray-900/60 hover:text-white transition-all duration-300 text-sm font-medium border border-gray-800/50 hover:border-blue-700/50 hover:shadow-lg hover:shadow-blue-600/10"
                 >
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                   </svg>
                   Visit Channel
                 </Link>
@@ -107,32 +127,34 @@ export default function ProfileSubscribers({ user }) {
           ))}
         </div>
       ) : !loading && (
-        <div className="text-center py-16">
-          <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        <div className="text-center py-16 bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-xl">
+          <div className="w-24 h-24 bg-gradient-to-br from-gray-900/50 to-gray-800/50 backdrop-blur-xl border border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <svg className="w-12 h-12 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
             </svg>
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">No subscribers yet</h3>
-          <p className="text-gray-400 mb-6">
+          <h3 className="text-xl font-bold text-transparent bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text mb-2">
+            No subscribers yet
+          </h3>
+          <p className="text-gray-400 mb-8 max-w-md mx-auto">
             Start creating amazing content to attract subscribers!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               to="/upload"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition-all duration-300 font-semibold shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 transform hover:scale-105"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
+                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
               </svg>
               Upload Video
             </Link>
             <Link 
               to="/tweets"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors font-medium"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-slate-400 via-slate-300 to-slate-400 hover:from-slate-300 hover:via-slate-200 hover:to-slate-300 text-slate-900 rounded-lg transition-all duration-300 font-semibold shadow-lg shadow-slate-500/30 hover:shadow-slate-400/50 transform hover:scale-105"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z"/>
+                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
               </svg>
               Share Thoughts
             </Link>
