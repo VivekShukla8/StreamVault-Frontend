@@ -1,6 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { AuthContext } from "../features/auth/AuthContext";
+import { 
+  LayoutDashboard, 
+  Upload, 
+  ListVideo, 
+  BarChart3,
+  Search,
+  LogOut
+} from "lucide-react";
 
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
@@ -13,6 +21,13 @@ export default function Navbar() {
       navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
+
+  const navItems = [
+    { path: "/dashboard", icon: LayoutDashboard, title: "Dashboard", color: "from-violet-500 to-purple-500" },
+    { path: "/upload", icon: Upload, title: "Upload Video", color: "from-green-500 to-emerald-500" },
+    { path: "/playlists", icon: ListVideo, title: "Playlists", color: "from-indigo-500 to-blue-500" },
+    { path: "/about", icon: BarChart3, title: "Channel Analytics", color: "from-amber-500 to-orange-500" },
+  ];
 
   return (
     <nav className="w-full bg-gradient-to-r from-slate-950 via-gray-950 to-zinc-950 px-6 py-4 border-b border-slate-800/50 flex items-center justify-between sticky top-0 z-50 backdrop-blur-xl">
@@ -54,21 +69,24 @@ export default function Navbar() {
 
       {/* Search Bar */}
       <div className="flex-1 max-w-2xl mx-8">
-        <form onSubmit={handleSearch} className="flex">
+        <form onSubmit={handleSearch} className="flex relative group">
+          {/* Gradient glow on focus */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-2xl opacity-0 group-focus-within:opacity-100 blur-lg transition-opacity duration-500"></div>
+          
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search videos..."
-            className="flex-1 bg-slate-900/50 text-slate-100 px-5 py-3 border border-slate-700/50 rounded-l-2xl focus:outline-none focus:border-slate-500/50 transition-all duration-300 placeholder-slate-400 backdrop-blur-sm"
+            className="flex-1 bg-slate-900/50 text-slate-100 px-5 py-3 border border-slate-700/50 rounded-l-2xl focus:outline-none focus:border-slate-500/50 transition-all duration-300 placeholder-slate-400 backdrop-blur-sm relative z-10"
           />
           <button
             type="submit"
-            className="bg-slate-800/60 px-6 py-3 border border-l-0 border-slate-700/50 rounded-r-2xl hover:bg-slate-700/60 transition-all duration-300 text-slate-300 hover:text-white"
+            className="bg-slate-800/60 px-6 py-3 border border-l-0 border-slate-700/50 rounded-r-2xl hover:bg-slate-700/60 transition-all duration-300 text-slate-300 hover:text-white group/btn relative z-10 overflow-hidden"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            {/* Gradient overlay on hover */}
+            <span className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></span>
+            <Search className="w-5 h-5 relative z-10 group-hover/btn:scale-110 transition-transform duration-300" />
           </button>
         </form>
       </div>
@@ -77,46 +95,82 @@ export default function Navbar() {
       <div className="flex items-center gap-3">
         {user ? (
           <>
-            <Link to="/dashboard" className="p-3 hover:bg-slate-800/60 rounded-2xl transition-all duration-300 text-slate-300 hover:text-white" title="Dashboard">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </Link>
-            <Link to="/upload" className="p-3 hover:bg-slate-800/60 rounded-2xl transition-all duration-300 text-slate-300 hover:text-white" title="Upload Video">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </Link>
-            <Link to="/playlists" className="p-3 hover:bg-slate-800/60 rounded-2xl transition-all duration-300 text-slate-300 hover:text-white" title="Playlists">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-            </Link>
-            <Link to="/about" className="p-3 hover:bg-slate-800/60 rounded-2xl transition-all duration-300 text-slate-300 hover:text-white" title="Channel Analytics">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </Link>
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link 
+                  key={item.path}
+                  to={item.path} 
+                  className="p-3 hover:bg-slate-800/60 rounded-2xl transition-all duration-300 text-slate-300 hover:text-white group/icon relative overflow-hidden" 
+                  title={item.title}
+                >
+                  {/* Gradient glow on hover */}
+                  <span className={`absolute inset-0 bg-gradient-to-r ${item.color} opacity-0 group-hover/icon:opacity-20 transition-opacity duration-300 rounded-2xl`}></span>
+                  
+                  {/* Bottom border */}
+                  <span className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${item.color} scale-x-0 group-hover/icon:scale-x-100 transition-transform duration-300 origin-center rounded-full`}></span>
+                  
+                  <Icon className="w-5 h-5 relative z-10 group-hover/icon:scale-110 transition-transform duration-300" />
+                </Link>
+              );
+            })}
+            
             <div className="relative">
-              <Link to="/profile/videos" className="flex items-center gap-2 p-2 hover:bg-slate-800/60 rounded-2xl transition-all duration-300">
-                <div className="w-9 h-9 bg-gradient-to-br from-slate-300 to-slate-400 rounded-2xl flex items-center justify-center">
-                  <span className="text-slate-900 font-semibold text-sm">
-                    {user?.username?.charAt(0)?.toUpperCase()}
-                  </span>
+              <Link to="/profile/videos" className="flex items-center gap-2 p-2 hover:bg-slate-800/60 rounded-2xl transition-all duration-300 group/profile relative overflow-hidden">
+                {/* Gradient glow on hover */}
+                <span className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 opacity-0 group-hover/profile:opacity-100 transition-opacity duration-300 rounded-2xl"></span>
+                
+                {/* Avatar with gradient border */}
+                <div className="relative">
+                  {/* Animated gradient border */}
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl opacity-0 group-hover/profile:opacity-100 transition-opacity duration-300"></div>
+                  
+                  {/* Avatar */}
+                  {user?.avatar ? (
+                    <img 
+                      src={user.avatar} 
+                      alt={user.username}
+                      className="w-9 h-9 rounded-2xl object-cover relative z-10"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-2xl flex items-center justify-center relative z-10">
+                      <span className="text-white font-semibold text-sm">
+                        {user?.username?.charAt(0)?.toUpperCase()}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </Link>
             </div>
-            <button onClick={logout} className="text-sm text-slate-400 hover:text-slate-200 px-4 py-2 rounded-2xl hover:bg-slate-800/60 transition-all duration-300">
-              Logout
+            
+            <button 
+              onClick={logout} 
+              className="text-sm text-slate-400 hover:text-slate-200 px-4 py-2 rounded-2xl hover:bg-slate-800/60 transition-all duration-300 flex items-center gap-2 group/logout relative overflow-hidden"
+            >
+              {/* Gradient glow on hover */}
+              <span className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-pink-500/20 opacity-0 group-hover/logout:opacity-100 transition-opacity duration-300 rounded-2xl"></span>
+              
+              <LogOut className="w-4 h-4 relative z-10 group-hover/logout:scale-110 transition-transform duration-300" />
+              <span className="relative z-10">Logout</span>
             </button>
           </>
         ) : (
           <div className="flex items-center gap-3">
-            <Link to="/login" className="px-5 py-2 text-slate-300 hover:text-white transition-colors duration-300">
-              Sign In
+            <Link 
+              to="/login" 
+              className="px-5 py-2 text-slate-300 hover:text-white transition-colors duration-300 relative group/signin overflow-hidden rounded-2xl"
+            >
+              {/* Gradient glow on hover */}
+              <span className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 opacity-0 group-hover/signin:opacity-100 transition-opacity duration-300"></span>
+              <span className="relative z-10">Sign In</span>
             </Link>
-            <Link to="/register" className="px-5 py-2 bg-slate-100 hover:bg-white text-slate-900 rounded-2xl transition-all duration-300 font-medium">
-              Sign Up
+            <Link 
+              to="/register" 
+              className="px-5 py-2 bg-slate-100 hover:bg-white text-slate-900 rounded-2xl transition-all duration-300 font-medium relative group/signup overflow-hidden"
+            >
+              {/* Gradient shine effect */}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/signup:translate-x-full transition-transform duration-700"></span>
+              <span className="relative z-10">Sign Up</span>
             </Link>
           </div>
         )}

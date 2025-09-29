@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Routes, Route, Link, useLocation } from "react-router-dom";
 import { getMe, getMyChannelStats } from "../api/user";
+import { 
+  RefreshCw, 
+  Edit3, 
+  Video, 
+  MessageSquare, 
+  Users, 
+  UserPlus, 
+  Eye,
+  Mail,
+  BarChart3
+} from "lucide-react";
 import Loader from "../components/Loader";
 import ProfileVideos from "./ProfileVideos";
 import ProfileTweets from "./ProfileTweets";
@@ -26,7 +37,7 @@ export default function Profile() {
                    currentPath.includes('/tweets') ? 'tweets' :
                    currentPath.includes('/subscribers') ? 'subscribers' :
                    currentPath.includes('/analytics') ? 'analytics' : 
-                   currentPath.includes('/requests') ? 'requests' : 'videos'; // Corrected activeTab logic
+                   currentPath.includes('/requests') ? 'requests' : 'videos';
 
   useEffect(() => {
     fetchUserProfile();
@@ -36,7 +47,6 @@ export default function Profile() {
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === 'profileUpdated') {
-        // Refresh profile data when updates are made
         fetchUserProfile();
         localStorage.removeItem('profileUpdated');
       }
@@ -44,7 +54,6 @@ export default function Profile() {
 
     window.addEventListener('storage', handleStorageChange);
     
-    // Also listen for custom events within the same tab
     const handleProfileUpdate = () => {
       fetchUserProfile();
     };
@@ -63,7 +72,6 @@ export default function Profile() {
       setError(null);
       console.log('Fetching user profile...');
       
-      // Get current user profile and statistics
       const [profileResponse, statsResponse] = await Promise.all([
         getMe(),
         getMyChannelStats()
@@ -90,7 +98,13 @@ export default function Profile() {
     }
   };
 
-
+  const tabItems = [
+    { key: 'videos', label: 'Videos', icon: Video, count: stats?.videosCount || 0, gradient: 'from-red-500 to-pink-500' },
+    { key: 'tweets', label: 'Tweets', icon: MessageSquare, count: stats?.tweetsCount || 0, gradient: 'from-sky-500 to-blue-500' },
+    { key: 'subscribers', label: 'Subscribers', icon: Users, count: stats?.subscribersCount || 0, gradient: 'from-purple-500 to-pink-500' },
+    { key: 'analytics', label: 'Analytics', icon: BarChart3, count: null, gradient: 'from-amber-500 to-orange-500' },
+    { key: 'requests', label: 'Requests', icon: Mail, count: null, gradient: 'from-emerald-500 to-teal-500' },
+  ];
 
   if (loading) return <Loader />;
   if (error) return <div className="text-center text-red-500 p-8">{error}</div>;
@@ -98,14 +112,14 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
-      {/* Cover Image Section */}
-      <div className="relative h-48 md:h-64 bg-gradient-to-r from-blue-900 to-purple-900 overflow-hidden">
+      {/* Cover Image Section - Reduced Height */}
+      <div className="relative h-32 md:h-40 bg-gradient-to-r from-blue-900 to-purple-900 overflow-hidden group">
         {user.coverImage && !coverImageError ? (
           <>
             <img
               src={user.coverImage}
               alt="Cover"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               onError={() => {
                 console.warn('Cover image failed to load:', user.coverImage);
                 setCoverImageError(true);
@@ -119,27 +133,26 @@ export default function Profile() {
                 setCoverImageLoading(true);
               }}
             />
-            {/* Loading overlay for cover image */}
             {coverImageLoading && (
               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                 <div className="text-center">
-                  <svg className="animate-spin h-8 w-8 text-white mx-auto mb-2" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-6 w-6 text-white mx-auto mb-1" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <p className="text-white text-sm">Loading cover image...</p>
+                  <p className="text-white text-xs">Loading...</p>
                 </div>
               </div>
             )}
           </>
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-700 flex items-center justify-center">
-            <div className="text-center p-4">
-              <svg className="w-16 h-16 text-gray-400 opacity-30 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
+            <div className="text-center p-3">
+              <svg className="w-10 h-10 text-gray-400 opacity-30 mx-auto mb-1" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/>
               </svg>
-              <p className="text-gray-400 text-lg opacity-70">
-                {coverImageError ? 'Cover image failed to load' : 'No cover image available'}
+              <p className="text-gray-400 text-sm opacity-70">
+                {coverImageError ? 'Failed to load' : 'No cover image'}
               </p>
               {coverImageError && (
                 <button 
@@ -154,27 +167,30 @@ export default function Profile() {
                     };
                     img.src = user.coverImage;
                   }}
-                  className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors shadow-md"
+                  className="mt-2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition-colors shadow-md"
                 >
-                  Retry Load
+                  Retry
                 </button>
               )}
             </div>
           </div>
         )}
-        <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/50 to-transparent"></div>
       </div>
 
-      {/* Profile Info Section */}
-      <div className="relative px-4 sm:px-6 -mt-20 z-10">
+      {/* Profile Info Section - Reduced Spacing */}
+      <div className="relative px-4 sm:px-6 -mt-12 z-10">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-start md:items-end gap-6">
-            {/* Avatar */}
-            <div className="relative flex-shrink-0">
+          <div className="flex flex-col md:flex-row items-start md:items-end gap-4">
+            {/* Avatar - Reduced Size */}
+            <div className="relative flex-shrink-0 group/avatar">
+              {/* Gradient ring */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full opacity-75 group-hover/avatar:opacity-100 blur-sm transition-opacity duration-300"></div>
+              
               <img
-                src={!avatarError && user.avatar ? user.avatar : 'https://via.placeholder.com/160x160/374151/9CA3AF?text=User'}
+                src={!avatarError && user.avatar ? user.avatar : 'https://via.placeholder.com/96x96/374151/9CA3AF?text=User'}
                 alt={user.fullname}
-                className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-gray-950 shadow-lg object-cover bg-gray-800"
+                className="w-30 h-30 md:w-34 md:h-34  rounded-full border-4 border-gray-950 shadow-lg object-cover bg-gray-800 relative z-10 transition-transform duration-300 group-hover/avatar:scale-105"
                 onError={() => {
                   console.warn('Avatar failed to load:', user.avatar);
                   setAvatarError(true);
@@ -183,73 +199,101 @@ export default function Profile() {
                   if (user.avatar) setAvatarError(false);
                 }}
               />
-              {/* Loading indicator for avatar updates (can be triggered by an actual update) */}
+              
               <div className="absolute inset-0 rounded-full bg-black bg-opacity-50 flex items-center justify-center opacity-0 transition-opacity duration-300 pointer-events-none" id="avatar-loading">
-                <svg className="animate-spin h-8 w-8 text-white" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               </div>
             </div>
 
-            {/* User Info & Stats */}
-            <div className="flex-1 w-full pb-4">
-              <div className="bg-gray-900 bg-opacity-80 backdrop-blur-md rounded-xl p-6 border border-gray-800 shadow-xl">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* User Info & Stats - Reduced Padding */}
+            <div className="flex-1 w-full pb-3 ml-5">
+              <div className="bg-gray-900 bg-opacity-80 backdrop-blur-md rounded-xl p-4 border border-gray-800 shadow-xl relative overflow-hidden">
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 pointer-events-none"></div>
+                
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 relative z-10">
                   <div className="flex-1">
                     <div>
-                      <h1 className="text-2xl md:text-3xl font-extrabold text-white mb-1">
+                      <h1 className="text-xl md:text-2xl font-extrabold text-white mb-0.5 bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
                         {user.fullname || 'Unknown User'}
                       </h1>
-                      <p className="text-gray-400 text-base mb-1">@{user.username}</p>
-                      {user.email && <p className="text-gray-500 text-sm">{user.email}</p>}
+                      <p className="text-gray-400 text-sm mb-0.5">@{user.username}</p>
+                      {user.email && <p className="text-gray-500 text-xs">{user.email}</p>}
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={() => {
                         console.log('Force refreshing profile...');
                         fetchUserProfile();
                       }}
-                      className="p-2 bg-gray-700 hover:bg-gray-600 text-white rounded-full transition-colors font-medium text-sm shadow-md"
+                      className="p-2 bg-gray-700 hover:bg-gray-600 text-white rounded-full transition-all duration-300 font-medium text-sm shadow-md group/refresh relative overflow-hidden"
                       title="Refresh Profile"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M4.524 4.545A7.002 7.002 0 0112 3a7.002 7.002 0 017 7c0 1.933-.674 3.737-1.802 5.112-.663.782-1.467 1.487-2.392 2.053-.925.566-1.947.967-3.031 1.173a7.014 7.014 0 01-3.649-.126c-1.107-.267-2.155-.767-3.111-1.494a7.004 7.004 0 01-2.484-2.618A6.98 6.98 0 013 10a7.002 7.002 0 011.524-5.455zm.813 1.137A6.002 6.002 0 0012 4a6.002 6.002 0 006 6c0 1.658-.574 3.208-1.545 4.394-.55.67-1.22 1.258-1.996 1.745-.776.487-1.637.795-2.559.923a6.012 6.012 0 01-3.13-.109c-.93-.225-1.81-.66-2.616-1.272a6.004 6.004 0 01-2.126-2.247A5.98 5.98 0 014 10a6.002 6.002 0 011.337-3.79z" clipRule="evenodd" />
-                        <path fillRule="evenodd" d="M10 5.25a.75.75 0 01.75-.75h1.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V6.75h-.75a.75.75 0 01-.75-.75zm-3.25 3.25a.75.75 0 01-.75-.75V6.75a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75zM15.75 8.5a.75.75 0 01-.75-.75V6.75a.75.75 0 011.5 0v1.5a.75.75 0 01-.75.75z" clipRule="evenodd" />
-                      </svg>
+                      <span className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover/refresh:opacity-100 transition-opacity duration-300"></span>
+                      <RefreshCw className="h-4 w-4 relative z-10 group-hover/refresh:rotate-180 transition-transform duration-500" />
                     </button>
                     <Link
                       to="/profile/edit"
-                      className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 font-semibold shadow-md transform hover:scale-105"
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 font-semibold shadow-md transform hover:scale-105 flex items-center gap-2 group/edit relative overflow-hidden text-sm"
                     >
-                      Edit Profile
+                      <span className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-500/20 opacity-0 group-hover/edit:opacity-100 transition-opacity duration-300"></span>
+                      <Edit3 className="h-3.5 w-3.5 relative z-10" />
+                      <span className="relative z-10">Edit Profile</span>
                     </Link>
                   </div>
                 </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-6 pt-4 border-t border-gray-800">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{stats?.videosCount || 0}</div>
-                    <div className="text-gray-400 text-sm">Videos</div>
+                {/* Stats - Reduced Size */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-4  pt-3 border-t border-gray-800 relative z-10">
+                  <div className="text-center group/stat cursor-pointer">
+                    <div className="relative">
+                      <div className="text-lg font-bold text-white group-hover/stat:text-transparent group-hover/stat:bg-gradient-to-r group-hover/stat:from-red-400 group-hover/stat:to-pink-500 group-hover/stat:bg-clip-text transition-all duration-300">
+                        {stats?.videosCount || 0}
+                      </div>
+                      <Video className="w-4 h-4 mx-auto mt-0.5 text-gray-600 group-hover/stat:text-red-500 transition-colors duration-300" />
+                    </div>
+                    <div className="text-gray-400 text-[15px] mt-0.5">Videos</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{stats?.tweetsCount || 0}</div>
-                    <div className="text-gray-400 text-sm">Tweets</div>
+                  <div className="text-center group/stat cursor-pointer">
+                    <div className="relative">
+                      <div className="text-lg font-bold text-white group-hover/stat:text-transparent group-hover/stat:bg-gradient-to-r group-hover/stat:from-sky-400 group-hover/stat:to-blue-500 group-hover/stat:bg-clip-text transition-all duration-300">
+                        {stats?.tweetsCount || 0}
+                      </div>
+                      <MessageSquare className="w-4 h-4 mx-auto mt-0.5 text-gray-600 group-hover/stat:text-sky-500 transition-colors duration-300" />
+                    </div>
+                    <div className="text-gray-400 text-[15px] mt-0.5">Tweets</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{stats?.subscribersCount || 0}</div>
-                    <div className="text-gray-400 text-sm">Subscribers</div>
+                  <div className="text-center group/stat cursor-pointer">
+                    <div className="relative">
+                      <div className="text-lg font-bold text-white group-hover/stat:text-transparent group-hover/stat:bg-gradient-to-r group-hover/stat:from-purple-400 group-hover/stat:to-pink-500 group-hover/stat:bg-clip-text transition-all duration-300">
+                        {stats?.subscribersCount || 0}
+                      </div>
+                      <Users className="w-4 h-4 mx-auto mt-0.5 text-gray-600 group-hover/stat:text-purple-500 transition-colors duration-300" />
+                    </div>
+                    <div className="text-gray-400 text-[15px] mt-0.5">Subscribers</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{stats?.subscriptionsCount || 0}</div>
-                    <div className="text-gray-400 text-sm">Subscriptions</div>
+                  <div className="text-center group/stat cursor-pointer">
+                    <div className="relative">
+                      <div className="text-lg font-bold text-white group-hover/stat:text-transparent group-hover/stat:bg-gradient-to-r group-hover/stat:from-emerald-400 group-hover/stat:to-teal-500 group-hover/stat:bg-clip-text transition-all duration-300">
+                        {stats?.subscriptionsCount || 0}
+                      </div>
+                      <UserPlus className="w-4 h-4 mx-auto mt-0.5 text-gray-600 group-hover/stat:text-emerald-500 transition-colors duration-300" />
+                    </div>
+                    <div className="text-gray-400 text-[15px]  mt-0.5">Subscriptions</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-white">{stats?.totalViews ? `${(stats.totalViews / 1000).toFixed(1)}K` : '0'}</div>
-                    <div className="text-gray-400 text-sm">Total Views</div>
+                  <div className="text-center group/stat cursor-pointer">
+                    <div className="relative">
+                      <div className="text-lg font-bold text-white group-hover/stat:text-transparent group-hover/stat:bg-gradient-to-r group-hover/stat:from-amber-400 group-hover/stat:to-orange-500 group-hover/stat:bg-clip-text transition-all duration-300">
+                        {stats?.totalViews ? `${(stats.totalViews / 1000).toFixed(1)}K` : '0'}
+                      </div>
+                      <Eye className="w-4 h-4 mx-auto mt-0.5 text-gray-600 group-hover/stat:text-amber-500 transition-colors duration-300" />
+                    </div>
+                    <div className="text-gray-400 text-[15px] mt-0.5">Total Views</div>
                   </div>
                 </div>
               </div>
@@ -259,64 +303,42 @@ export default function Profile() {
       </div>
 
       {/* Content Navigation */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-6">
         {/* Tab Navigation */}
         <div className="flex border-b border-gray-800 mb-6 overflow-x-auto justify-start">
-          <Link
-            to="/profile/videos"
-            className={`px-6 py-3 font-medium whitespace-nowrap transition-colors duration-200 relative group
-              ${activeTab === 'videos' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}
-            `}
-          >
-            Videos ({stats?.videosCount || 0})
-            {activeTab === 'videos' && (
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full"></span>
-            )}
-          </Link>
-          <Link
-            to="/profile/tweets"
-            className={`px-6 py-3 font-medium whitespace-nowrap transition-colors duration-200 relative group
-              ${activeTab === 'tweets' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}
-            `}
-          >
-            Tweets ({stats?.tweetsCount || 0})
-            {activeTab === 'tweets' && (
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full"></span>
-            )}
-          </Link>
-          <Link
-            to="/profile/subscribers"
-            className={`px-6 py-3 font-medium whitespace-nowrap transition-colors duration-200 relative group
-              ${activeTab === 'subscribers' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}
-            `}
-          >
-            Subscribers ({stats?.subscribersCount || 0})
-            {activeTab === 'subscribers' && (
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full"></span>
-            )}
-          </Link>
-          <Link
-            to="/profile/analytics"
-            className={`px-6 py-3 font-medium whitespace-nowrap transition-colors duration-200 relative group
-              ${activeTab === 'analytics' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}
-            `}
-          >
-            Analytics
-            {activeTab === 'analytics' && (
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full"></span>
-            )}
-          </Link>
-          <Link
-            to="/profile/requests"
-            className={`px-6 py-3 font-medium whitespace-nowrap transition-colors duration-200 relative group
-              ${activeTab === 'requests' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}
-            `}
-          >
-            Requests
-            {activeTab === 'requests' && (
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500 rounded-full"></span>
-            )}
-          </Link>
+          {tabItems.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.key;
+            
+            return (
+              <Link
+                key={tab.key}
+                to={`/profile/${tab.key}`}
+                className={`px-6 py-3 font-medium whitespace-nowrap transition-all duration-300 relative group overflow-hidden
+                  ${isActive ? 'text-blue-400' : 'text-gray-400 hover:text-white'}
+                `}
+              >
+                {/* Gradient glow on hover */}
+                <span className={`absolute inset-0 bg-gradient-to-r ${tab.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></span>
+                
+                <div className="flex items-center gap-2 relative z-10">
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-blue-400' : 'text-gray-500 group-hover:text-white'} transition-colors duration-300`} />
+                  <span>
+                    {tab.label}
+                    {tab.count !== null && ` (${tab.count})`}
+                  </span>
+                </div>
+                
+                {/* Active indicator */}
+                {isActive && (
+                  <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r ${tab.gradient} rounded-full`}></span>
+                )}
+                
+                {/* Hover indicator */}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r ${tab.gradient} rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left ${isActive ? 'hidden' : ''}`}></span>
+              </Link>
+            );
+          })}
         </div>
 
         {/* Tab Content - Rendered as Routes */}
@@ -327,7 +349,7 @@ export default function Profile() {
             <Route path="/subscribers" element={<ProfileSubscribers user={user} />} />
             <Route path="/analytics" element={<ProfileAnalytics user={user} stats={stats} />} />
             <Route path="/requests" element={<MessageRequestsPanel />} />
-            <Route path="*" element={<ProfileVideos user={user} />} /> {/* Fallback/Default route */}
+            <Route path="*" element={<ProfileVideos user={user} />} />
           </Routes>
         </div>
       </div>

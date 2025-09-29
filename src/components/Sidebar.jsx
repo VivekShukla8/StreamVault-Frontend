@@ -2,11 +2,20 @@ import { Link, useLocation } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../features/auth/AuthContext";
 import { 
-  HomeIcon, 
-  UserIcon, 
-  MessageCircleIcon, 
-  BellIcon,
-  SettingsIcon 
+  Home,
+  TrendingUp,
+  MessageSquare,
+  Tv,
+  Library,
+  Clock,
+  Heart,
+  LayoutDashboard,
+  Upload,
+  Video,
+  ListVideo,
+  User,
+  Mail,
+  Info
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -16,23 +25,23 @@ export default function Sidebar() {
   const isActive = (path) => location.pathname === path;
 
   const sidebarItems = [
-    { path: "/", icon: "🏠", label: "Home" },
-    { path: "/trending", icon: "🔥", label: "Trending" },
-    { path: "/tweets", icon: "🐦", label: "Tweets" },
-    { path: "/subscriptions", icon: "📺", label: "Subscriptions" },
-    { path: "/library", icon: "📚", label: "Library" },
-    { path: "/history", icon: "🕒", label: "History" },
-    { path: "/liked", icon: "❤️", label: "Liked videos" },
+    { path: "/", icon: Home, label: "Home", color: "from-blue-500 to-cyan-500" },
+    { path: "/trending", icon: TrendingUp, label: "Trending", color: "from-orange-500 to-red-500" },
+    { path: "/tweets", icon: MessageSquare, label: "Tweets", color: "from-sky-400 to-blue-500" },
+    { path: "/subscriptions", icon: Tv, label: "Subscriptions", color: "from-purple-500 to-pink-500" },
+    { path: "/library", icon: Library, label: "Library", color: "from-emerald-500 to-teal-500" },
+    { path: "/history", icon: Clock, label: "History", color: "from-amber-500 to-orange-500" },
+    { path: "/liked", icon: Heart, label: "Liked videos", color: "from-pink-500 to-rose-500" },
   ];
 
   const userItems = user ? [
-    { path: "/dashboard", icon: "📊", label: "Dashboard" },
-    { path: "/upload", icon: "📤", label: "Upload" },
-    { path: "/my-videos", icon: "🎥", label: "My videos" },
-    { path: "/playlists", icon: "📋", label: "Playlists" },
-    { path: "/profile/videos", icon: "👤", label: "Profile" },
-    { path: "/messages/conversations", icon: "💬", label: "Messages" },
-    { path: "/about", icon: "ℹ️", label: "About" },
+    { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard", color: "from-violet-500 to-purple-500" },
+    { path: "/upload", icon: Upload, label: "Upload", color: "from-green-500 to-emerald-500" },
+    { path: "/my-videos", icon: Video, label: "My videos", color: "from-red-500 to-pink-500" },
+    { path: "/playlists", icon: ListVideo, label: "Playlists", color: "from-indigo-500 to-blue-500" },
+    { path: "/profile/videos", icon: User, label: "Profile", color: "from-cyan-500 to-teal-500" },
+    { path: "/messages/conversations", icon: Mail, label: "Messages", color: "from-fuchsia-500 to-pink-500" },
+    { path: "/about", icon: Info, label: "About", color: "from-slate-400 to-gray-500" },
   ] : [];
 
   return (
@@ -40,19 +49,38 @@ export default function Sidebar() {
       <div className="p-6">
         {/* Main Navigation */}
         <ul className="space-y-2">
-          {sidebarItems.map((item) => (
-            <li key={item.path}>
-              <Link
-                to={item.path}
-                className={`flex items-center gap-4 px-4 py-3 rounded-2xl hover:bg-slate-800/60 transition-all duration-300 group ${
-                  isActive(item.path) ? "bg-slate-800/60 text-white" : "text-slate-400 hover:text-white"
-                }`}
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform duration-300">{item.icon}</span>
-                <span className="text-sm font-medium">{item.label}</span>
-              </Link>
-            </li>
-          ))}
+          {sidebarItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`flex items-center gap-4 px-4 py-3 rounded-2xl transition-all duration-300 group relative overflow-hidden ${
+                    isActive(item.path) 
+                      ? "bg-slate-800/60 text-white" 
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/60"
+                  }`}
+                >
+                  {/* Gradient border on hover */}
+                  <span className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${item.color} opacity-0 group-hover:opacity-20 transition-opacity duration-300`}></span>
+                  
+                  {/* Animated bottom border line */}
+                  <span className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${item.color} scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left`}></span>
+                  
+                  <Icon className={`w-5 h-5 group-hover:scale-110 transition-transform duration-300 relative z-10 ${
+                    isActive(item.path) ? 'text-white' : ''
+                  }`} />
+                  
+                  <span className="text-sm font-medium relative z-10">{item.label}</span>
+                  
+                  {/* Active indicator */}
+                  {isActive(item.path) && (
+                    <span className={`absolute right-2 w-1.5 h-1.5 rounded-full bg-gradient-to-r ${item.color}`}></span>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
 
         {/* User Section */}
@@ -60,19 +88,36 @@ export default function Sidebar() {
           <>
             <hr className="my-4 border-gray-800" />
             <ul className="space-y-1">
-              {userItems.map((item) => (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    className={`flex items-center gap-4 px-3 py-2 rounded-lg hover:bg-gray-800 transition-colors ${
-                      isActive(item.path) ? "bg-gray-800" : ""
-                    }`}
-                  >
-                    <span className="text-xl">{item.icon}</span>
-                    <span className="text-sm font-medium">{item.label}</span>
-                  </Link>
-                </li>
-              ))}
+              {userItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.path}>
+                    <Link
+                      to={item.path}
+                      className={`flex items-center gap-4 px-3 py-2 rounded-lg transition-colors group relative overflow-hidden ${
+                        isActive(item.path) ? "bg-gray-800" : "hover:bg-gray-800"
+                      }`}
+                    >
+                      {/* Gradient glow on hover */}
+                      <span className={`absolute inset-0 rounded-lg bg-gradient-to-r ${item.color} opacity-0 group-hover:opacity-15 transition-opacity duration-300`}></span>
+                      
+                      {/* Animated bottom border line */}
+                      <span className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${item.color} scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center`}></span>
+                      
+                      <Icon className={`w-5 h-5 group-hover:scale-105 transition-transform duration-200 relative z-10 ${
+                        isActive(item.path) ? 'text-white' : ''
+                      }`} />
+                      
+                      <span className="text-sm font-medium relative z-10">{item.label}</span>
+                      
+                      {/* Active indicator */}
+                      {isActive(item.path) && (
+                        <span className={`absolute right-2 w-1.5 h-1.5 rounded-full bg-gradient-to-r ${item.color}`}></span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </>
         )}
