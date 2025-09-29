@@ -1,7 +1,7 @@
 // src/socket.js
 import { io } from "socket.io-client";
 
-const SOCKET_SERVER_URL = "https://streamvault-backend-production-ccf9.up.railway.app";
+const SOCKET_SERVER_URL = "http://localhost:8000";
 
 let socket = null;
 
