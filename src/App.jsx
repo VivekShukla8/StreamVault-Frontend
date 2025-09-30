@@ -1,5 +1,5 @@
-import React, {useEffect,useContext} from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Routes, Route } from "react-router-dom"; // Remove BrowserRouter
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./features/auth/AuthContext";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -31,57 +31,54 @@ import MessageRequestsPanel from "./components/MessageRequestsPanel";
 import ChatPage from "./components/ChatPage";
 import ConversationPage from "./components/ConversationPage";
 import initSocket from "./socket";
-import { AuthContext } from "./features/auth/AuthContext";
 
 export default function App() {
   useEffect(() => {
-    // call once on app boot (will read token from localStorage)
     initSocket();
   }, []);
 
   return (
     <ToastProvider>
-    <ErrorBoundary>
+      <ErrorBoundary>
         <ThemeProvider>
           <AuthProvider>
-               <Routes>
-                <Route element={<MainLayout />}>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/video/:id" element={<VideoDetail />} />
-                  <Route path="/channel/:id" element={<ChannelDetail />} />
-                  <Route path="/channel/:id/about" element={<About />} />
-                  <Route path="/profile/edit" element={<EditProfile />} />
-                  <Route path="/profile/*" element={<Profile />} />
-                  <Route path="/tweets" element={<Tweets />} />
-                  <Route path="/search" element={<SearchResults />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/upload" element={<UploadVideo />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/trending" element={<Trending />} />
-                  <Route path="/subscriptions" element={<Subscriptions />} />
-                  <Route path="/library" element={<Library />} />
-                  <Route path="/history" element={<History />} />
-                  <Route path="/liked" element={<LikedVideos />} />
-                  <Route path="/my-videos" element={<MyVideos />} />
-                  <Route path="/playlists" element={<Playlists />} />
-                  <Route path="/playlist/:id" element={<PlaylistDetail />} />
-                  <Route path="/category/:category" element={<Home />} />
-                  <Route path="/requests" element={<MessageRequestsPanel />} />
-                  <Route path="/messages/conversations" element={<ChatPage />} />
-                  <Route path="/messages/conversations/:conversationId" element={<ConversationPage />} />
-                </Route>
+            <Routes>
+              <Route element={<MainLayout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/video/:id" element={<VideoDetail />} />
+                <Route path="/channel/:id" element={<ChannelDetail />} />
+                <Route path="/channel/:id/about" element={<About />} />
+                <Route path="/profile/edit" element={<EditProfile />} />
+                <Route path="/profile/*" element={<Profile />} />
+                <Route path="/tweets" element={<Tweets />} />
+                <Route path="/search" element={<SearchResults />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/upload" element={<UploadVideo />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/trending" element={<Trending />} />
+                <Route path="/subscriptions" element={<Subscriptions />} />
+                <Route path="/library" element={<Library />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/liked" element={<LikedVideos />} />
+                <Route path="/my-videos" element={<MyVideos />} />
+                <Route path="/playlists" element={<Playlists />} />
+                <Route path="/playlist/:id" element={<PlaylistDetail />} />
+                <Route path="/category/:category" element={<Home />} />
+                <Route path="/requests" element={<MessageRequestsPanel />} />
+                <Route path="/messages/conversations" element={<ChatPage />} />
+                <Route path="/messages/conversations/:conversationId" element={<ConversationPage />} />
+              </Route>
 
-                <Route element={<AuthLayout />}>
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/register" element={<RegisterPage />} />
-                </Route>
+              <Route element={<AuthLayout />}>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+              </Route>
 
-                <Route path="*" element={<NotFound />} />
-              </Routes> 
-             
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </AuthProvider>
         </ThemeProvider>
-    </ErrorBoundary>
+      </ErrorBoundary>
     </ToastProvider>
   );
 }
