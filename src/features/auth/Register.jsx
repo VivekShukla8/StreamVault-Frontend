@@ -49,11 +49,12 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background blobs */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-500 transform -translate-x-1/2 -translate-y-1/2"></div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gray-700/3 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gray-600/3 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      </div>
 
       {/* Toast */}
       {toast && (
@@ -64,103 +65,125 @@ export default function Register() {
         />
       )}
 
-      {/* Main container */}
-      <div className="w-full max-w-xl relative z-10 flex flex-col items-center">
-        {/* Logo above the card */}
-        <div className="text-center mb-6">
-          <Link to="/" className="flex items-center gap-3 justify-center group">
-            <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400 rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:shadow-2xl group-hover:rotate-3">
-                <div className="relative">
-                  <div className="w-6 h-6 bg-gradient-to-br from-gray-700 to-gray-900 rounded-sm transform rotate-45 relative">
-                    <div className="absolute inset-1 bg-gray-200 rounded-sm transform -rotate-45">
-                      <div className="w-full h-full flex items-center justify-center">
-                        <div className="w-1.5 h-1.5 bg-gray-800 rounded-sm transform rotate-45"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      <div className="max-w-xl mx-auto relative z-10">
+        {/* Logo + Brand */}
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-flex flex-col items-center group">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-600/20 transform group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
             </div>
-            <div className="flex flex-col">
-              <span className="font-light text-2xl text-gray-100 tracking-wide group-hover:text-white transition-colors duration-300 leading-tight">
-                StreamVault
-              </span>
-              <span className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300 tracking-widest uppercase">
-                Premium Media
-              </span>
-            </div>
+            <span className="text-3xl font-bold text-transparent bg-gradient-to-r from-slate-200 via-slate-100 to-slate-300 bg-clip-text group-hover:from-blue-200 group-hover:via-indigo-100 group-hover:to-blue-300 transition-all duration-300">
+              StreamVault
+            </span>
+            <span className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300 tracking-widest uppercase mt-1">
+              Premium Media
+            </span>
           </Link>
         </div>
 
-        {/* Card only for form */}
-        <div className="bg-gradient-to-br from-blue-700/70 via-gray-800/70 to-gray-900/70 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-700/50 p-8 w-full relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-2xl"></div>
+        <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-2xl shadow-2xl p-8">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-transparent bg-gradient-to-r from-slate-200 via-slate-100 to-slate-300 bg-clip-text mb-2">
+              Create Your Account
+            </h2>
+            <p className="text-gray-400">Join StreamVault and start sharing</p>
+          </div>
 
-          <form onSubmit={submit} className="space-y-5 relative z-10">
+          <form onSubmit={submit} className="space-y-5">
             {/* Fullname */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-200 mb-2">
+            <div className="group">
+              <label className="block text-sm font-medium text-slate-300 mb-2 group-focus-within:text-amber-400 transition-colors duration-300">
                 Full Name
               </label>
-              <input
-                type="text"
-                required
-                value={form.fullname}
-                onChange={(e) => handleInputChange("fullname", e.target.value)}
-                placeholder="Enter full name"
-                className="w-full px-4 py-3 bg-gray-700/60 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 transition-all duration-300 hover:border-gray-500/50"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  value={form.fullname}
+                  onChange={(e) => handleInputChange("fullname", e.target.value)}
+                  placeholder="Enter full name"
+                  className="w-full px-4 py-3 pl-11 bg-gray-900/40 border border-gray-800/50 hover:border-amber-500/30 focus:border-amber-500/50 focus:ring-amber-500/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 focus:shadow-xl focus:shadow-amber-500/20 hover:bg-gray-900/60"
+                />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-amber-400 group-hover:text-amber-400/70 transition-colors duration-300">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             {/* Username */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-200 mb-2">
+            <div className="group">
+              <label className="block text-sm font-medium text-slate-300 mb-2 group-focus-within:text-amber-400 transition-colors duration-300">
                 Username
               </label>
-              <input
-                type="text"
-                required
-                value={form.username}
-                onChange={(e) => handleInputChange("username", e.target.value)}
-                placeholder="Choose a username"
-                className="w-full px-4 py-3 bg-gray-700/60 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 transition-all duration-300 hover:border-gray-500/50"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  value={form.username}
+                  onChange={(e) => handleInputChange("username", e.target.value)}
+                  placeholder="Choose a username"
+                  className="w-full px-4 py-3 pl-11 bg-gray-900/40 border border-gray-800/50 hover:border-amber-500/30 focus:border-amber-500/50 focus:ring-amber-500/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 focus:shadow-xl focus:shadow-amber-500/20 hover:bg-gray-900/60"
+                />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-amber-400 group-hover:text-amber-400/70 transition-colors duration-300">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             {/* Email */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-200 mb-2">
+            <div className="group">
+              <label className="block text-sm font-medium text-slate-300 mb-2 group-focus-within:text-amber-400 transition-colors duration-300">
                 Email
               </label>
-              <input
-                type="email"
-                required
-                value={form.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                placeholder="Enter email"
-                className="w-full px-4 py-3 bg-gray-700/60 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 transition-all duration-300 hover:border-gray-500/50"
-              />
+              <div className="relative">
+                <input
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  placeholder="Enter email"
+                  className="w-full px-4 py-3 pl-11 bg-gray-900/40 border border-gray-800/50 hover:border-amber-500/30 focus:border-amber-500/50 focus:ring-amber-500/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 focus:shadow-xl focus:shadow-amber-500/20 hover:bg-gray-900/60"
+                />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-amber-400 group-hover:text-amber-400/70 transition-colors duration-300">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             {/* Password */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-200 mb-2">
+            <div className="group">
+              <label className="block text-sm font-medium text-slate-300 mb-2 group-focus-within:text-amber-400 transition-colors duration-300">
                 Password
               </label>
-              <input
-                type="password"
-                required
-                value={form.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
-                placeholder="Create a password"
-                className="w-full px-4 py-3 bg-gray-700/60 border border-gray-600/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 transition-all duration-300 hover:border-gray-500/50"
-              />
+              <div className="relative">
+                <input
+                  type="password"
+                  required
+                  value={form.password}
+                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  placeholder="Create a password"
+                  className="w-full px-4 py-3 pl-11 bg-gray-900/40 border border-gray-800/50 hover:border-amber-500/30 focus:border-amber-500/50 focus:ring-amber-500/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 focus:shadow-xl focus:shadow-amber-500/20 hover:bg-gray-900/60"
+                />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-amber-400 group-hover:text-amber-400/70 transition-colors duration-300">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             {/* Avatar */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-200 mb-2">
+            <div className="group">
+              <label className="block text-sm font-medium text-slate-300 mb-2 group-focus-within:text-green-400 transition-colors duration-300">
                 Avatar
               </label>
               <input
@@ -168,29 +191,32 @@ export default function Register() {
                 accept="image/*"
                 required
                 onChange={(e) => handleFileChange("avatar", e.target.files[0])}
-                className="w-full px-4 py-3 bg-gray-700/60 border border-gray-600/50 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition-all duration-300"
+                className="w-full px-4 py-3 bg-gray-900/40 border border-gray-800/50 hover:border-green-500/30 focus:border-green-500/50 focus:ring-green-500/20 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-green-600/50 file:to-emerald-600/50 file:text-green-200 hover:file:from-green-600/70 hover:file:to-emerald-600/70 file:transition-all file:duration-300 file:shadow-md hover:file:shadow-lg hover:file:shadow-green-500/30 focus:outline-none focus:ring-2 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/10 focus:shadow-xl focus:shadow-green-500/20 cursor-pointer"
               />
             </div>
 
             {/* Cover Image */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-200 mb-2">
+            <div className="group">
+              <label className="block text-sm font-medium text-slate-300 mb-2 group-focus-within:text-purple-400 transition-colors duration-300">
                 Cover Image (Optional)
               </label>
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) =>
-                  handleFileChange("coverImage", e.target.files[0])
-                }
-                className="w-full px-4 py-3 bg-gray-700/60 border border-gray-600/50 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-600 file:text-white hover:file:bg-gray-700 transition-all duration-300"
+                onChange={(e) => handleFileChange("coverImage", e.target.files[0])}
+                className="w-full px-4 py-3 bg-gray-900/40 border border-gray-800/50 hover:border-purple-500/30 focus:border-purple-500/50 focus:ring-purple-500/20 rounded-xl text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-purple-600/50 file:to-indigo-600/50 file:text-purple-200 hover:file:from-purple-600/70 hover:file:to-indigo-600/70 file:transition-all file:duration-300 file:shadow-md hover:file:shadow-lg hover:file:shadow-purple-500/30 focus:outline-none focus:ring-2 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10 focus:shadow-xl focus:shadow-purple-500/20 cursor-pointer"
               />
             </div>
 
             {/* Error */}
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 backdrop-blur-sm text-red-300">
-                {error}
+              <div className="bg-gradient-to-r from-red-900/30 to-pink-900/30 backdrop-blur-sm border border-red-600/30 rounded-xl p-4 animate-shake">
+                <p className="text-red-400 text-sm flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                  </svg>
+                  {error}
+                </p>
               </div>
             )}
 
@@ -198,8 +224,9 @@ export default function Register() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-indigo-700 hover:to-blue-600 disabled:from-blue-600/50 disabled:to-indigo-700/50 text-white font-bold py-3 px-5 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/25 disabled:scale-100 disabled:cursor-not-allowed relative overflow-hidden group"
+              className="w-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-gray-900 py-4 px-6 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-amber-600/30 hover:shadow-amber-500/50 hover:shadow-2xl disabled:shadow-none flex items-center justify-center gap-3 transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none relative overflow-hidden group"
             >
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-300/0 via-yellow-300/30 to-yellow-300/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
               <span className="relative z-10">
                 {loading ? "Creating account..." : "Create Account"}
               </span>
@@ -207,14 +234,37 @@ export default function Register() {
           </form>
 
           {/* Sign in link */}
-          <div className="mt-5 text-center relative z-10">
-            <span className="text-gray-400 mr-2">Already have an account?</span>
-            <Link to="/login" className="text-white font-medium hover:underline">
+          <div className="mt-6 text-center">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-800"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-3 bg-gray-950/70 text-gray-400">
+                  Already have an account?
+                </span>
+              </div>
+            </div>
+            <Link 
+              to="/login" 
+              className="inline-block mt-4 text-amber-400 hover:text-amber-300 font-semibold transition-colors duration-300"
+            >
               Sign in
             </Link>
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        .animate-shake {
+          animation: shake 0.3s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }

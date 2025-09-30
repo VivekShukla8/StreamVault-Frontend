@@ -30,75 +30,102 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background blobs (kept same as Register) */}
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-500/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-500 transform -translate-x-1/2 -translate-y-1/2"></div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gray-700/3 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gray-600/3 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+      </div>
 
-      <div className="w-full max-w-2xl relative z-10">
+      <div className="max-w-md mx-auto relative z-10">
         {/* Logo + Brand */}
-        <div className="text-center mb-10">
-          <Link to="/" className="flex items-center gap-3 justify-center group">
-            {/* same logo code here */}
-            <div className="flex flex-col">
-              <span className="font-light text-3xl text-gray-100 tracking-wide group-hover:text-white transition-colors duration-300 leading-tight">
-                StreamVault
-              </span>
-              <span className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300 tracking-widest uppercase">
-                Premium Media
-              </span>
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-flex flex-col items-center group">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-600/20 transform group-hover:scale-110 transition-transform duration-300">
+              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
             </div>
+            <span className="text-3xl font-bold text-transparent bg-gradient-to-r from-slate-200 via-slate-100 to-slate-300 bg-clip-text group-hover:from-blue-200 group-hover:via-indigo-100 group-hover:to-blue-300 transition-all duration-300">
+              StreamVault
+            </span>
+            <span className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300 tracking-widest uppercase mt-1">
+              Premium Media
+            </span>
           </Link>
         </div>
 
-        {/* Form card */}
-        <div className="bg-gradient-to-br from-blue-700/70 via-gray-800/70 to-gray-900/70 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-700/50 p-10 relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-3xl"></div>
+        <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl border border-gray-800/50 rounded-2xl shadow-2xl p-8">
+          {/* Header */}
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-transparent bg-gradient-to-r from-slate-200 via-slate-100 to-slate-300 bg-clip-text mb-2">
+              Welcome Back
+            </h2>
+            <p className="text-gray-400">Sign in to continue to your account</p>
+          </div>
 
-          <form onSubmit={submit} className="space-y-6 relative z-10">
+          <form onSubmit={submit} className="space-y-5">
             {/* Email */}
-            <div>
+            <div className="group">
               <label
                 htmlFor="email"
-                className="block text-sm font-semibold text-gray-200 mb-2"
+                className="block text-sm font-medium text-slate-300 mb-2 group-focus-within:text-amber-400 transition-colors duration-300"
               >
                 Email Address
               </label>
-              <input
-                id="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full px-5 py-4 bg-gray-700/60 border border-gray-600/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 transition-all duration-300 hover:border-gray-500/50"
-              />
+              <div className="relative">
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="w-full px-4 py-3 pl-11 bg-gray-900/40 border border-gray-800/50 hover:border-amber-500/30 focus:border-amber-500/50 focus:ring-amber-500/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 focus:shadow-xl focus:shadow-amber-500/20 hover:bg-gray-900/60"
+                />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-amber-400 group-hover:text-amber-400/70 transition-colors duration-300">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             {/* Password */}
-            <div>
+            <div className="group">
               <label
                 htmlFor="password"
-                className="block text-sm font-semibold text-gray-200 mb-2"
+                className="block text-sm font-medium text-slate-300 mb-2 group-focus-within:text-amber-400 transition-colors duration-300"
               >
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="w-full px-5 py-4 bg-gray-700/60 border border-gray-600/50 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 transition-all duration-300 hover:border-gray-500/50"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full px-4 py-3 pl-11 bg-gray-900/40 border border-gray-800/50 hover:border-amber-500/30 focus:border-amber-500/50 focus:ring-amber-500/20 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10 focus:shadow-xl focus:shadow-amber-500/20 hover:bg-gray-900/60"
+                />
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-amber-400 group-hover:text-amber-400/70 transition-colors duration-300">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             {/* Error message */}
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 backdrop-blur-sm text-red-300">
-                {error}
+              <div className="bg-gradient-to-r from-red-900/30 to-pink-900/30 backdrop-blur-sm border border-red-600/30 rounded-xl p-4 animate-shake">
+                <p className="text-red-400 text-sm flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+                  </svg>
+                  {error}
+                </p>
               </div>
             )}
 
@@ -106,8 +133,9 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-indigo-700 hover:to-blue-600 disabled:from-blue-600/50 disabled:to-indigo-700/50 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/25 disabled:scale-100 disabled:cursor-not-allowed relative overflow-hidden group"
+              className="w-full bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 hover:from-amber-500 hover:via-yellow-400 hover:to-amber-500 text-gray-900 py-4 px-6 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg shadow-amber-600/30 hover:shadow-amber-500/50 hover:shadow-2xl disabled:shadow-none flex items-center justify-center gap-3 transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none relative overflow-hidden group"
             >
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-300/0 via-yellow-300/30 to-yellow-300/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
               <span className="relative z-10">
                 {loading ? "Signing in..." : "Sign In"}
               </span>
@@ -118,10 +146,10 @@ export default function Login() {
           <div className="mt-6 mb-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-600"></div>
+                <div className="w-full border-t border-gray-800"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-800 text-gray-400">
+                <span className="px-3 bg-gray-950/70 text-gray-400">
                   New to StreamVault?
                 </span>
               </div>
@@ -129,21 +157,21 @@ export default function Login() {
           </div>
 
           {/* Register Link */}
-          <div className="text-center relative z-10">
+          <div className="text-center">
             <Link
               to="/register"
-              className="inline-flex items-center justify-center px-6 py-3 bg-gray-700/50 hover:bg-gray-700/70 border border-gray-600/50 hover:border-gray-500/50 text-gray-300 hover:text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg cursor-pointer relative z-10"
+              className="inline-flex items-center justify-center px-6 py-3 bg-gray-900/40 hover:bg-gray-800/60 border border-gray-800/50 hover:border-gray-700/50 text-gray-300 hover:text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-gray-700/20 group"
             >
               <svg
-                className="w-5 h-5 mr-2"
+                className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                strokeWidth={2}
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
                   d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
                 />
               </svg>
@@ -153,9 +181,16 @@ export default function Login() {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8">
+        <div className="text-center mt-6">
           <p className="text-gray-500 text-sm">
-            By signing in, you agree to our Terms of Service and Privacy Policy
+            By signing in, you agree to our{" "}
+            <span className="text-gray-400 hover:text-amber-400 transition-colors duration-300 cursor-pointer">
+              Terms of Service
+            </span>
+            {" "}and{" "}
+            <span className="text-gray-400 hover:text-amber-400 transition-colors duration-300 cursor-pointer">
+              Privacy Policy
+            </span>
           </p>
         </div>
       </div>
@@ -168,6 +203,17 @@ export default function Login() {
           onClose={() => setToast(null)}
         />
       )}
+
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        .animate-shake {
+          animation: shake 0.3s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }
