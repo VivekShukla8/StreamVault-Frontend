@@ -8,9 +8,7 @@ import { AuthContext } from "../features/auth/AuthContext";
 import Loader from "../components/Loader";
 import AddToPlaylistDropdown from "../components/AddToPlaylistDropdown";
 import CustomVideoPlayer from "../components/CustomVideoPlayer";
-import ShareButton from "../components/ShareButton";
 import Toast from "../components/Toast";
-import { useShare } from "../hooks/useShare";
 import MessageButton from "../components/MessageButton";
 
 // Custom styles for scrollbar
@@ -41,7 +39,6 @@ if (typeof document !== 'undefined') {
 export default function VideoDetail() {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
-  const { shareVideo, showToast, closeToast } = useShare();
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -57,6 +54,10 @@ export default function VideoDetail() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [relatedVideos, setRelatedVideos] = useState([]);
   const [loadingRelated, setLoadingRelated] = useState(true);
+  
+  // Toast states
+  const [showShareSuccessToast, setShowShareSuccessToast] = useState(false);
+  const [showShareErrorToast, setShowShareErrorToast] = useState(false);
 
   // Effects
   useEffect(() => {
@@ -377,12 +378,25 @@ export default function VideoDetail() {
                     {formatViews(likeCount)}
                   </button>
                   
-                  <ShareButton
-                    onClick={() => shareVideo(id)}
-                    size="medium"
-                    variant="default"
-                    className="px-4 py-2 font-medium text-sm shadow-lg hover:shadow-xl active:scale-95"
-                  />
+                  <button
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(`${window.location.origin}/#/video/${id}`);
+                        setShowShareSuccessToast(true);
+                        setTimeout(() => setShowShareSuccessToast(false), 3000);
+                      } catch (err) {
+                        console.error('Share failed:', err);
+                        setShowShareErrorToast(true);
+                        setTimeout(() => setShowShareErrorToast(false), 3000);
+                      }
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-900/40 text-gray-300 rounded-xl transition-all duration-300 hover:bg-gray-800/60 hover:text-white border border-gray-800/50 font-medium text-sm shadow-lg hover:shadow-xl active:scale-95"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    </svg>
+                    Share
+                  </button>
                   
                   <div className="relative playlist-dropdown-container">
                     <button 
@@ -558,95 +572,110 @@ export default function VideoDetail() {
                   <div className="text-center py-12">
                     <p className="text-gray-400">No comments yet</p>
                     <p className="text-gray-500 text-sm mt-1">Be the first to comment!</p>
-                  </div>
-                )}
               </div>
-            </div>
-          </div>
+              )}
+              </div>
+              </div>
+              </div>
+              {/* Sidebar - Related Videos - 4 columns */}
+      <div className="lg:col-span-4">
+        <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-800/50 shadow-xl sticky top-6">
+          <h3 className="text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21,3H3C2,3 1,4 1,5V19A2,2 0 0,0 3,21H21C22,21 23,20 23,19V5C23,4 22,3 21,3M20,18H4V6H20V18M6,9H11V14H6V9M12,9H18V11H12V9M12,12H18V14H12V12Z"/>
+            </svg>
+            Related Videos
+          </h3>
           
-          {/* Sidebar - Related Videos - 4 columns */}
-          <div className="lg:col-span-4">
-            <div className="bg-gradient-to-br from-gray-950/70 to-gray-900/50 backdrop-blur-xl rounded-2xl p-6 border border-gray-800/50 shadow-xl sticky top-6">
-              <h3 className="text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M21,3H3C2,3 1,4 1,5V19A2,2 0 0,0 3,21H21C22,21 23,20 23,19V5C23,4 22,3 21,3M20,18H4V6H20V18M6,9H11V14H6V9M12,9H18V11H12V9M12,12H18V14H12V12Z"/>
-                </svg>
-                Related Videos
-              </h3>
-              
-              {loadingRelated ? (
-                <div className="space-y-4">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="animate-pulse">
-                      <div className="bg-gray-800/50 rounded-xl h-24"></div>
-                    </div>
-                  ))}
+          {loadingRelated ? (
+            <div className="space-y-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-800/50 rounded-xl h-24"></div>
                 </div>
-              ) : relatedVideos.length > 0 ? (
-                <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
-                  {relatedVideos.map((relatedVideo) => (
-                    <Link
-                      key={relatedVideo._id}
-                      to={`/video/${relatedVideo._id}`}
-                      className="group block"
-                    >
-                      <div className="flex gap-3 p-3 bg-gray-900/30 rounded-xl border border-gray-800/30 hover:border-amber-500/30 hover:bg-gray-900/50 transition-all duration-300">
-                        <div className="relative flex-shrink-0 w-40 aspect-video rounded-lg overflow-hidden">
-                          <img
-                            src={relatedVideo.thumbnail}
-                            alt={relatedVideo.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          {relatedVideo.duration && (
-                            <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white font-medium">
-                              {formatDuration(relatedVideo.duration)}
-                            </div>
-                          )}
+              ))}
+            </div>
+          ) : relatedVideos.length > 0 ? (
+            <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
+              {relatedVideos.map((relatedVideo) => (
+                <Link
+                  key={relatedVideo._id}
+                  to={`/video/${relatedVideo._id}`}
+                  className="group block"
+                >
+                  <div className="flex gap-3 p-3 bg-gray-900/30 rounded-xl border border-gray-800/30 hover:border-amber-500/30 hover:bg-gray-900/50 transition-all duration-300">
+                    <div className="relative flex-shrink-0 w-40 aspect-video rounded-lg overflow-hidden">
+                      <img
+                        src={relatedVideo.thumbnail}
+                        alt={relatedVideo.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {relatedVideo.duration && (
+                        <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white font-medium">
+                          {formatDuration(relatedVideo.duration)}
                         </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-slate-200 text-sm line-clamp-2 mb-2 group-hover:text-amber-400 transition-colors duration-300">
-                            {relatedVideo.title}
-                          </h4>
-                          <div className="space-y-1">
-                            <p className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
-                              {relatedVideo.owner?.username || 'Unknown'}
-                            </p>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
-                              <span>{formatViews(relatedVideo.views)} views</span>
-                              <span>•</span>
-                              <span>{formatTimeAgo(relatedVideo.createdAt)}</span>
-                            </div>
-                          </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-slate-200 text-sm line-clamp-2 mb-2 group-hover:text-amber-400 transition-colors duration-300">
+                        {relatedVideo.title}
+                      </h4>
+                      <div className="space-y-1">
+                        <p className="text-xs text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
+                          {relatedVideo.owner?.username || 'Unknown'}
+                        </p>
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <span>{formatViews(relatedVideo.views)} views</span>
+                          <span>•</span>
+                          <span>{formatTimeAgo(relatedVideo.createdAt)}</span>
                         </div>
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-gradient-to-br from-gray-800 to-gray-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M21,3H3C2,3 1,4 1,5V19A2,2 0 0,0 3,21H21C22,21 23,20 23,19V5C23,4 22,3 21,3M20,18H4V6H20V18M6,9H11V14H6V9M12,9H18V11H12V9M12,12H18V14H12V12Z"/>
-                    </svg>
+                    </div>
                   </div>
-                  <p className="text-gray-400 text-sm">No related videos</p>
-                </div>
-              )}
+                </Link>
+              ))}
             </div>
-          </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-800 to-gray-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M21,3H3C2,3 1,4 1,5V19A2,2 0 0,0 3,21H21C22,21 23,20 23,19V5C23,4 22,3 21,3M20,18H4V6H20V18M6,9H11V14H6V9M12,9H18V11H12V9M12,12H18V14H12V12Z"/>
+                </svg>
+              </div>
+              <p className="text-gray-400 text-sm">No related videos</p>
+            </div>
+          )}
         </div>
       </div>
-      
-      {/* Toast Notification */}
-      {showToast && (
-        <Toast
-          message="Video URL copied to clipboard!"
-          type="success"
-          duration={2000}
-          onClose={closeToast}
-        />
-      )}
     </div>
-  );
+  </div>
+  
+  {/* Toast Notifications */}
+  <div className="fixed top-2 right-2 left-2 sm:top-4 sm:right-4 sm:left-auto z-[9999] flex flex-col gap-2 w-auto max-w-full sm:max-w-sm pointer-events-none">
+    {showShareSuccessToast && (
+      <div className="w-full animate-slide-down">
+        <Toast 
+          message="Video URL copied to clipboard!" 
+          type="success" 
+          duration={3000} 
+          onClose={() => setShowShareSuccessToast(false)}
+          className="text-xs sm:text-sm md:text-base p-2.5 sm:p-3 md:p-4 rounded-md sm:rounded-lg shadow-lg"
+        />
+      </div>
+    )}
+    {showShareErrorToast && (
+      <div className="w-full animate-slide-down">
+        <Toast 
+          message="Failed to copy video link" 
+          type="error" 
+          duration={3000} 
+          onClose={() => setShowShareErrorToast(false)}
+          className="text-xs sm:text-sm md:text-base p-2.5 sm:p-3 md:p-4 rounded-md sm:rounded-lg shadow-lg"
+        />
+      </div>
+    )}
+  </div>
+</div>
+);
 }

@@ -6,8 +6,8 @@ import Sidebar from "../components/Sidebar";
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleMenuClick = () => {
-    setSidebarOpen(true);
+  const handleMenuToggle = () => {
+    setSidebarOpen((prev) => !prev); // toggle instead of always true
   };
 
   const handleSidebarClose = () => {
@@ -17,7 +17,7 @@ export default function MainLayout() {
   return (
     <div className="min-h-screen bg-slate-950">
       {/* Navbar - Fixed at top, full width */}
-      <Navbar onMenuClick={handleMenuClick} />
+      <Navbar onMenuClick={handleMenuToggle} isSidebarOpen={sidebarOpen} />
       
       {/* Content wrapper */}
       <div className="relative">

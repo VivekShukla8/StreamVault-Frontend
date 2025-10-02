@@ -4,7 +4,7 @@ export const useShare = () => {
   const { showToast } = useToast(); // Use the context toast
 
   const shareVideo = (videoId) => {
-    const videoUrl = `${window.location.origin}/video/${videoId}`;
+    const videoUrl = `${window.location.origin}/#/video/${videoId}`;
     navigator.clipboard.writeText(videoUrl)
       .then(() => {
         showToast('Video URL copied to clipboard!');
@@ -16,7 +16,7 @@ export const useShare = () => {
   };
 
   const shareChannel = (channelId) => {
-    const channelUrl = `${window.location.origin}/channel/${channelId}`;
+    const channelUrl = `${window.location.origin}/#/channel/${channelId}`;
     navigator.clipboard.writeText(channelUrl)
       .then(() => {
         showToast('Channel URL copied to clipboard!');
@@ -28,7 +28,7 @@ export const useShare = () => {
   };
 
   const sharePlaylist = (playlistId) => {
-    const playlistUrl = `${window.location.origin}/playlist/${playlistId}`;
+    const playlistUrl = `${window.location.origin}/#/playlist/${playlistId}`;
     navigator.clipboard.writeText(playlistUrl)
       .then(() => {
         showToast('Playlist URL copied to clipboard!');
