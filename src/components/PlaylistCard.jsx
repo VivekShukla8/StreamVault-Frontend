@@ -144,7 +144,7 @@ export default function PlaylistCard({ playlist, onDelete, onUpdate, formatTimeA
                   <img
                     src={thumbnailUrl}
                     alt={playlist.name}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                     onError={(e) => {
                       console.log('Image failed to load:', thumbnailUrl);
                       e.target.style.display = 'none';

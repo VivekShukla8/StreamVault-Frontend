@@ -436,7 +436,7 @@ export default function VideoDetail() {
                         <img
                           src={video.owner.avatar}
                           alt={video.owner.username}
-                          className="w-full h-full rounded-full object-cover"
+                          className="w-full h-full rounded-full object-contain"
                         />
                       ) : (
                         <span className="text-lg font-bold text-gray-900">
@@ -608,7 +608,7 @@ export default function VideoDetail() {
                       <img
                         src={relatedVideo.thumbnail}
                         alt={relatedVideo.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                       />
                       {relatedVideo.duration && (
                         <div className="absolute bottom-2 right-2 bg-black/80 px-2 py-1 rounded text-xs text-white font-medium">

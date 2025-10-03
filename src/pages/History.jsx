@@ -283,7 +283,7 @@ export default function History() {
                     <img
                       src={video.thumbnail || '/api/placeholder/320/180'}
                       alt={video.title}
-                      className="w-full aspect-video object-cover bg-slate-900"
+                      className="w-full aspect-video object-contain bg-slate-900"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-2 right-2 bg-black/90 text-white text-xs px-2 py-1 rounded backdrop-blur-sm font-semibold">
@@ -338,7 +338,7 @@ export default function History() {
                     <img
                       src={video.thumbnail || '/api/placeholder/320/180'}
                       alt={video.title}
-                      className="w-full h-24 md:h-28 lg:h-32 object-cover bg-slate-900 rounded-lg group-hover/thumb:scale-105 transition-transform duration-300 shadow-lg"
+                      className="w-full h-24 md:h-28 lg:h-32 object-contain bg-slate-900 rounded-lg group-hover/thumb:scale-105 transition-transform duration-300 shadow-lg"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/20 rounded-lg transition-colors duration-300" />
                     <div className="absolute bottom-2 right-2 bg-black/90 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm font-semibold">
