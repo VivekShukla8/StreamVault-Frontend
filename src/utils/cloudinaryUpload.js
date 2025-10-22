@@ -1,12 +1,17 @@
+// Utility function to upload files to Cloudinary with backend signature
 export async function uploadToCloudinary(file, folder) {
   if (!file) throw new Error("No file provided");
+
+  // 💡 Use an environment variable for the base URL
+    // Replace REACT_APP_BACKEND_URL with your actual env variable name (e.g., VITE_BACKEND_URL)
+  const BACKEND_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
 
   // detect type
   const type = file.type.startsWith("video/") ? "video" : "image";
 
-  // ask backend for signature (include folder in query)
+  // ask backend for signature (include folder in query)   
   const res = await fetch(
-    `http://localhost:8000/api/v1/cloudinary/sign-upload?folder=${folder}`
+        `${BACKEND_BASE_URL}/cloudinary/sign-upload?folder=${folder}` // Use dynamic URL here
   );
 
   if (!res.ok) throw new Error("Failed to get signature from backend");
