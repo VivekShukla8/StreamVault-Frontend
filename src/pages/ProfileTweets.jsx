@@ -102,6 +102,38 @@ export default function ProfileTweets({ user }) {
     return `${Math.floor(diffInSeconds / 31536000)}y ago`;
   };
 
+   const handleToggleLike = async (tweetId) => {
+    if (likingTweets.has(tweetId)) return;
+    
+    try {
+      setLikingTweets(prev => new Set(prev).add(tweetId));
+      const response = await toggleTweetLike(tweetId);
+      
+      const { isLiked, likeCount } = response.data?.data || {};
+      
+      setTweets(prev => prev.map(tweet => {
+        if (tweet._id === tweetId) {
+          return {
+            ...tweet,
+            isLiked: isLiked,
+            likesCount: likeCount !== undefined ? likeCount : tweet.likesCount
+          };
+        }
+        return tweet;
+      }));
+      
+    } catch (err) {
+      console.error("Error toggling like:", err);
+      setError("Failed to update like");
+    } finally {
+      setLikingTweets(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(tweetId);
+        return newSet;
+      });
+    }
+  };
+
   if (loading) return <Loader />;
 
   return (
