@@ -106,7 +106,7 @@ To view the application's design, replace the placeholders below with high-resol
 
 *A view of the immersive dark theme, responsive navigation, and content grid, emphasizing the application's visual appeal and ability to adapt to **any size of screen**.*
 
-![Home Page Screenshot](images/homepage.png)
+![Home Page Screenshot](images/Screenshot (96))
 
 ### 2. Real-Time Chat & Messaging
 
