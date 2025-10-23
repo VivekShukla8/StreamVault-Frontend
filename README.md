@@ -106,32 +106,41 @@ To view the application's design, replace the placeholders below with high-resol
 
 *A view of the immersive dark theme, responsive navigation, and content grid, emphasizing the application's visual appeal and ability to adapt to **any size of screen**.*
 
-![Home Page Screenshot](images/Screenshot (96).png)
+![Home Page Screenshot](images/Screenshot(96).png)
 
 ### 2. Real-Time Chat & Messaging
 
 *Showcases the core chat feature, message bubbles, and the dedicated messages interface.*
 
-| Conversations List | Dedicated Chat Window |
+| Conversations List | Dedicated Chat Window | Message Requests | 
 | :--- | :--- |
-| **![Conversations List](images/Screenshot (97).png)** | **![Chat Window](images/Screenshot (99).png)** |
+| **![Conversations List](images/Screenshot(97).png)** | **![Chat Window](images/Screenshot(99).png)** | **![Message Requests](images/Screenshot(98).png)** |
+
 
 ### 3. Creator Dashboard & Analytics
 
 *Highlights the visual, centralized statistics and creator tools.*
 
-![Creator Dashboard Screenshot](images/creator_dashboard.png)
+| Creator Dashboard | Analytics |
+| :--- | :--- |
+| **![Dashboard](images/Screenshot(100).png)** | **![Analytics](images/Screenshot(106).png)** |
 
 ### 4. Video Playback & Interactivity
 
 *The video detail page featuring the custom player, subscription status, and action buttons.*
 
-![Video Detail Page Screenshot](images/video_detail.png)
+| **![Video Deatils Page](images/Screenshot(101).png)** | **![Description, subscriber and other Section](images/Screenshot(102).png)** |
 
 ### 5. Library & Playlists
 
 *A view of the personalized library page, displaying lists of content and custom playlist cards.*
 
-![Playlists Management Screenshot](images/playlists.png)
+| **![Library ](images/Screenshot(110).png)** | **![Playlist Management](images/Screenshot(112).png)** |
+
+### 6. Trending and Subscriptions
+
+*A view of the trending vidoes and showing subscribed channel for a user.*
+
+| **![Trending Videos](images/Screenshot(111).png)** | **![Playlist Management](images/Screenshot(108).png)** |
 
 ---
